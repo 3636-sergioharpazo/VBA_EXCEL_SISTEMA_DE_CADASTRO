@@ -1,0 +1,88 @@
+
+Option Explicit
+Sub json()
+
+
+On Error Resume Next
+Dim req As New MSXML2.ServerXMLHTTP60
+Dim htmldoc As New MSHTML.HTMLDocument
+Dim resultado As MSHTML.IHTMLElement
+Dim endPoint As String
+Dim cep As String
+
+cep = "62420000"
+'endPoint = "https://viacep.com.br/ws/" & cep & "/json/"
+
+endPoint = "https://pokeapi.co/api/v2/pokemon/"
+req.Open "GET", endPoint
+req.send
+
+'Debug.Print req.responseXML
+
+
+htmldoc.body.innerHTML = req.responseText
+
+Set resultado = htmldoc.getElementsByTagName("localidade")(0)
+
+
+'parse (req.responseText)
+
+
+
+'Range("A1").Value = resultado
+'Debug.Print req.responseText
+
+Call parse(req.responseText, 8)
+
+End Sub
+
+Sub parse(resposta As String, indice As Integer)
+
+Dim matriz As Variant
+Dim i As Integer
+Dim submatriz As Variant
+Dim resultado As String
+
+matriz = Split(resposta, ":")
+
+
+For i = 1 To UBound(matriz)
+    
+ submatriz = Split(matriz(indice), ",")
+
+resultado = submatriz(0)
+resultado = Trim(resultado)
+resultado = Replace(resultado, Chr(34), "")
+resultado = Replace(resultado, "}", "")
+
+
+Debug.Print resultado
+
+ 
+'Range("A" & i) = matriz(i)
+
+
+Next
+
+
+
+
+
+
+
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
