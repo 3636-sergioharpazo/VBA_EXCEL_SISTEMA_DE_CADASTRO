@@ -1,0 +1,53 @@
+Dim api As New MSXML2.ServerXMLHTTP60
+    Dim html As Object
+    Dim url As String
+    Dim cep As String
+
+    On Error GoTo errorHandler ' Configura o manipulador de erros
+    
+    cep = txtCep.Value
+    
+    ' Verifica se o campo CEP está vazio
+    If cep = "" Then
+        MsgBox "Digite o CEP novamente", vbCritical, "Aviso"
+        txtCep.SetFocus
+        Exit Sub
+    End If
+    
+    ' Constrói a URL para a requisição da API
+    url = "https://viacep.com.br/ws/" & cep & "/xml/"
+    
+    ' Faz a requisição da API
+    api.Open "GET", url, False
+    api.send
+    
+    ' Verifica o status da resposta
+    If api.Status <> 200 Then
+        MsgBox "Erro ao conectar com o serviço ViaCEP", vbCritical, "Erro"
+        Exit Sub
+    End If
+    
+    ' Carrega a resposta no documento HTML
+    Set html = CreateObject("htmlfile")
+    html.body.innerHTML = api.responseText
+    
+    ' Verifica se a resposta contém um endereço válido
+    If html.getElementsByTagName("erro").Length = 0 Then
+        ' Popula os campos do formulário com os dados do endereço
+        txtEnd.Value = html.getElementsByTagName("logradouro")(0).innerText
+        txtBairro.Value = html.getElementsByTagName("bairro")(0).innerText
+        txtCidade.Value = html.getElementsByTagName("localidade")(0).innerText
+        txtUF.Value = html.getElementsByTagName("uf")(0).innerText
+    Else
+        ' Manipula o caso em que o CEP não foi encontrado
+        MsgBox "CEP não encontrado", vbExclamation, "Aviso"
+        ClearFields
+    End If
+    
+    Exit Sub
+
+errorHandler:
+    ' Manipula qualquer erro que ocorrer durante a requisição da API
+    MsgBox "Ocorreu um erro ao buscar o endereço: " & Err.Description, vbCritical, "Erro"
+    ClearFields
+End Sub
