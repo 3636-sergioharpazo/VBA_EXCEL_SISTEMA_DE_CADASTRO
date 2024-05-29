@@ -1,0 +1,45 @@
+Sub cep()
+    ' Declarar variáveis
+    Dim api As New MSXML2.ServerXMLHTTP60 ' Instância do objeto ServerXMLHTTP60
+    Dim html As Object ' Objeto para analisar a resposta HTML/XML
+    Dim url As String ' String para armazenar a URL da API
+    Dim cep As String ' String para armazenar o CEP (código postal)
+    Dim xmlDoc As Object ' Objeto para armazenar o XML da resposta
+
+    ' Atribuir valor ao CEP
+    cep = "04835030"
+    
+    ' Construir a URL para a requisição da API
+    url = "https://viacep.com.br/ws/" & cep & "/xml/"
+    
+    On Error GoTo ErrorHandler
+    
+    ' Abrir uma requisição GET para a URL
+    api.Open "GET", url, False
+    
+    ' Enviar a requisição
+    api.send
+    
+    ' Verificar se a resposta é bem-sucedida
+    If api.Status = 200 Then
+        ' Criar um documento XML para analisar a resposta
+        Set xmlDoc = CreateObject("MSXML2.DOMDocument")
+        xmlDoc.LoadXML api.responseText
+        
+        ' Verificar se a tag "logradouro" existe na resposta
+        If xmlDoc.getElementsByTagName("logradouro").Length > 0 Then
+            ' Pegar o valor da tag "logradouro" e colocar na célula A1
+            Cells(1, 1).Value = xmlDoc.getElementsByTagName("logradouro")(0).Text
+        Else
+            Cells(1, 1).Value = "Tag 'logradouro' não encontrada."
+        End If
+    Else
+        Cells(1, 1).Value = "Erro na resposta da API: " & api.Status & " - " & api.statusText
+    End If
+    
+    Exit Sub
+
+ErrorHandler:
+    Cells(1, 1).Value = "Erro: " & Err.Description
+End Sub
+
