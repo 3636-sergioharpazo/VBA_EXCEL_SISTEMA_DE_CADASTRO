@@ -1,0 +1,60 @@
+﻿# Copyright (c) 1993-2009 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+# 102.54.94.97 rhino.acme.com # source server
+# 38.25.63.10 x.acme.com # x client host
+
+# localhost name resolution is handled within DNS itself.
+#	127.0.0.1 localhost
+#	::1 localhost
+# Added by Docker Desktop
+192.168.100.44 host.docker.internal
+192.168.100.44 gateway.docker.internal
+# To allow the same kube context to work on the host and the container:
+127.0.0.1 kubernetes.docker.internal
+# End of section
+127.0.0.1 localhost
+::1 localhost
+# Bloqueio de YouTube
+127.0.0.1 www.youtube.com
+127.0.0.1 m.youtube.com
+127.0.0.1 youtube.com
+
+# Bloqueio de Facebook
+127.0.0.1 www.facebook.com
+127.0.0.1 facebook.com
+127.0.0.1 m.facebook.com
+
+# Bloqueio de Instagram
+127.0.0.1 www.instagram.com
+127.0.0.1 instagram.com
+
+# Bloqueio de Sites de Jogos (alguns exemplos)
+127.0.0.1 www.miniclip.com
+127.0.0.1 miniclip.com
+127.0.0.1 www.addictinggames.com
+127.0.0.1 addictinggames.com
+127.0.0.1 www.roblox.com
+127.0.0.1 roblox.com
+127.0.0.1 www.pogo.com
+127.0.0.1 pogo.com
+127.0.0.1 www.kongregate.com
+127.0.0.1 kongregate.com
+127.0.0.1 www.armorgames.com
+127.0.0.1 armorgames.com
+
+# Bloqueio de Jogo do Tigrinho
+127.0.0.1 www.jogodotigrinho.com
+127.0.0.1 jogodotigrinho.com
