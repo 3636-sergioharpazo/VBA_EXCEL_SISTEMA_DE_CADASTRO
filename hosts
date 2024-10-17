@@ -41,7 +41,19 @@
 127.0.0.1 www.instagram.com
 127.0.0.1 instagram.com
 
-# Bloqueio de Sites de Jogos (alguns exemplos)
+# Bloqueio de Twitter
+127.0.0.1 www.twitter.com
+127.0.0.1 twitter.com
+
+# Bloqueio de TikTok
+127.0.0.1 www.tiktok.com
+127.0.0.1 tiktok.com
+
+# Bloqueio de Snapchat
+127.0.0.1 www.snapchat.com
+127.0.0.1 snapchat.com
+
+# Bloqueio de Sites de Jogos
 127.0.0.1 www.miniclip.com
 127.0.0.1 miniclip.com
 127.0.0.1 www.addictinggames.com
@@ -54,7 +66,29 @@
 127.0.0.1 kongregate.com
 127.0.0.1 www.armorgames.com
 127.0.0.1 armorgames.com
-
-# Bloqueio de Jogo do Tigrinho
 127.0.0.1 www.jogodotigrinho.com
 127.0.0.1 jogodotigrinho.com
+
+# Bloqueio de Sites de Apostas
+127.0.0.1 www.bovada.lv
+127.0.0.1 bovada.lv
+127.0.0.1 www.888.com
+127.0.0.1 888.com
+127.0.0.1 www.bet365.com
+127.0.0.1 bet365.com
+
+# Bloqueio de Sites de Conteúdo Adulto
+127.0.0.1 www.pornhub.com
+127.0.0.1 pornhub.com
+127.0.0.1 www.xvideos.com
+127.0.0.1 xvideos.com
+127.0.0.1 www.xnxx.com
+127.0.0.1 xnxx.com
+
+# Bloqueio de Outros Sites Potencialmente Perigosos
+127.0.0.1 www.wikipedia.org
+127.0.0.1 wikipedia.org
+127.0.0.1 www.reddit.com
+127.0.0.1 reddit.com
+127.0.0.1 www.torrentz.com
+127.0.0.1 torrentz.com
