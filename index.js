@@ -77,7 +77,12 @@ app.get("/", (req, res) => {
     </html>
   `);
 });
-const port = 3001;
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});
 // Inicia o servidor Express
 app.listen(port, () => {
     console.log(`🌐 Servidor rodando em http://localhost:${port}`);
