@@ -12,9 +12,9 @@ const port = 3000;
 
 let qrCodeImage = "";
 
-// Serviço de leitura do QR Code (Terminal)
+// Serviço de leitura do QR Code (Terminal e Web)
 client.on('qr', qr => {
-    qrcode.generate(qr, { small: true });
+    qrcode.generate(qr, { small: true }); // Exibe no terminal
 
     // Gera o QR Code para a interface web
     qrcodeWeb.toDataURL(qr, (err, url) => {
@@ -26,9 +26,74 @@ client.on('qr', qr => {
 
 // Evento quando o bot estiver pronto
 client.on("ready", () => {
-    console.log("Bot pronto!");
+    console.log("✅ Bot conectado ao WhatsApp!");
 });
 
+// Evento quando a conexão for estabelecida com o celular
+client.on("authenticated", () => {
+    console.log("📲 WhatsApp conectado ao celular!");
+});
+
+// Inicializa o cliente
+client.initialize();
+
+// Rota para exibir o QR Code na página web
+app.get("/", (req, res) => {
+    let refreshScript = qrCodeImage
+        ? ""
+        : `<script>setTimeout(() => location.reload(), 3000);</script>`;
+
+    res.send(`
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>QR Code WhatsApp</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+          body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+          }
+          .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1 class="mb-3">Escaneie o QR Code para conectar</h1>
+          ${qrCodeImage 
+            ? `<img src="${qrCodeImage}" class="img-fluid" />`
+            : `<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Carregando...</span></div>
+               <p class="mt-3">Gerando QR Code...</p>`}
+          ${refreshScript}
+        </div>
+      </body>
+    </html>
+  `);
+});
+
+// Inicia o servidor Express
+app.listen(port, () => {
+    console.log(`🌐 Servidor rodando em http://localhost:${port}`);
+});
+
+
+// Evento quando a conexão for estabelecida com o celular
+client.on("authenticated", () => {
+    console.log("📲 WhatsApp conectado ao celular!");
+});
+
+// Inicializa o cliente
 client.initialize();
 
 // Rota para exibir o QR Code na página web
@@ -49,8 +114,9 @@ app.get("/", (req, res) => {
   `);
 });
 
+// Inicia o servidor Express
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`🌐 Servidor rodando em http://localhost:${port}`);
 });
 
 // Quando o cliente estiver pronto
