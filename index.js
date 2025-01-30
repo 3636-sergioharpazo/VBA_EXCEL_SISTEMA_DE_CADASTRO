@@ -8,7 +8,7 @@ const express = require("express");
 // Inicializa o cliente
 const client = new Client();
 const app = express();
-const port = 3001;
+const port = 3002;
 
 let qrCodeImage = "";
 
@@ -22,6 +22,10 @@ client.on('qr', qr => {
             qrCodeImage = url;
         }
     });
+});
+const PORT = process.env.PORT || 3002; // Mudar a porta
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 // Evento quando o bot estiver pronto
