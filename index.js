@@ -35,7 +35,14 @@ function generateQRCode() {
 
 // Quando o cliente estiver pronto
 client.on("ready", () => {
-  console.log("Bot pronto!");
+    console.log('Tudo certo! WhatsApp conectado.');
+    
+
+
+// Executa a função a cada 5 minuto para garantir precisão
+setInterval(enviarLembretes, 5 * 60 * 1000);
+
+ 
   connectionStatus = "Conectado"; // Atualiza para conectado
 });
 
@@ -95,19 +102,19 @@ client.on("authenticated", () => {
 });
 
 // Quando o cliente estiver pronto
-client.on('ready', () => {
-    console.log('Tudo certo! WhatsApp conectado.');
+//client.on('ready', () => {
+  //  console.log('Tudo certo! WhatsApp conectado.');
     
 
 
 // Executa a função a cada 5 minuto para garantir precisão
-setInterval(enviarLembretes, 5 * 60 * 1000);
+//setInterval(enviarLembretes, 5 * 60 * 1000);
 
 
 
-});
+//});
 
-client.initialize();
+//client.initialize();
 
 // Função para criar delay
 const delay = ms => new Promise(res => setTimeout(res, ms));
