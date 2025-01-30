@@ -59,12 +59,10 @@ app.get("/", async (req, res) => {
   try {
     if (!qrCodeImage) {
       await generateQRCode(); // Gera o QR Code se não houver
-    }
-
-    // Se a conexão estiver estabelecida, redireciona para a página "Conectado"
-    if (connectionStatus === "Conectado") {
-      return res.send(if (connectionStatus === "Conectado") {
-  return res.send(`<html>
+    }// Se a conexão estiver estabelecida, redireciona para a página "Conectado"
+if (connectionStatus === "Conectado") {
+  return res.send(`
+    <html>
       <head>
         <title>Conectado ao WhatsApp</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -75,9 +73,11 @@ app.get("/", async (req, res) => {
           <p class="lead">O seu WhatsApp foi conectado com sucesso.</p>
         </div>
       </body>
-    </html>`);
+    </html>
+  `);
 }
 
+// Caso contrário, exibe a tela com o QR Code
 res.send(`
   <html>
     <head>
@@ -98,6 +98,7 @@ res.send(`
     </body>
   </html>
 `);
+
 
   } catch (error) {
     res.send('Erro ao gerar QR Code');
