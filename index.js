@@ -6,7 +6,7 @@ const { Client, LocalAuth } = require('whatsapp-web.js'); // Adicionado LocalAut
 const express = require("express");
 
 const app = express();
-const port = 3002;
+const port = 3001;
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -15,21 +15,23 @@ const client = new Client({
 let qrCodeImage = "";
 let connectionStatus = "Desconectado"; // Inicializa como desconectado
 
-// Geração do QR Code para terminal
-client.on("qr", (qr) => {
-  qrcode.toString(qr, { small: true }, (err, qrCode) => {
-    if (!err) {
-      console.log(qrCode); // Exibe o QR code no terminal
-    }
-  });
+// Geração do QR Code para terminal e imagem
+function generateQRCode() {
+  client.on("qr", (qr) => {
+    qrcode.toString(qr, { small: true }, (err, qrCode) => {
+      if (!err) {
+        console.log(qrCode); // Exibe o QR code no terminal
+      }
+    });
 
-  // Geração do QR Code para imagem
-  qrcodeWeb.toDataURL(qr, (err, url) => {
-    if (!err) {
-      qrCodeImage = url; // Armazena a URL da imagem do QR code
-    }
+    // Geração do QR Code para imagem
+    qrcodeWeb.toDataURL(qr, (err, url) => {
+      if (!err) {
+        qrCodeImage = url; // Armazena a URL da imagem do QR code
+      }
+    });
   });
-});
+}
 
 // Quando o cliente estiver pronto
 client.on("ready", () => {
@@ -41,10 +43,14 @@ client.on("ready", () => {
 client.on("disconnected", () => {
   console.log("Bot desconectado.");
   connectionStatus = "Desconectado"; // Atualiza para desconectado
+  generateQRCode(); // Gera novamente o QR Code quando desconectado
 });
 
 // Inicializa o cliente
 client.initialize();
+
+// Gera o QR Code inicialmente
+generateQRCode();
 
 // Rota HTTP
 app.get("/", (req, res) => {
@@ -87,6 +93,7 @@ app.listen(port, () => {
 client.on("authenticated", () => {
   console.log("📲 WhatsApp conectado ao celular!");
 });
+
 // Quando o cliente estiver pronto
 client.on('ready', () => {
     console.log('Tudo certo! WhatsApp conectado.');
