@@ -26,17 +26,22 @@ client.on("ready", () => {
 client.initialize();
 
 app.get("/", (req, res) => {
+  let refreshScript = qrCodeImage
+    ? ""
+    : `<script>setTimeout(() => location.reload(), 3000);</script>`;
+
   res.send(`
     <html>
       <head><title>QR Code WhatsApp</title></head>
       <body>
         <h1>Escaneie o QR Code para conectar</h1>
-        <img src="${qrCodeImage}" />
+        ${qrCodeImage ? `<img src="${qrCodeImage}" />` : "<p>Gerando QR Code...</p>"}
+        ${refreshScript}
       </body>
     </html>
   `);
 });
 
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://seu-render-url:${port}`);
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });
