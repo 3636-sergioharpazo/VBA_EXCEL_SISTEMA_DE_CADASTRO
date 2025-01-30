@@ -63,65 +63,42 @@ app.get("/", async (req, res) => {
 
     // Se a conexão estiver estabelecida, redireciona para a página "Conectado"
     if (connectionStatus === "Conectado") {
-      return res.send(`
-        <html>
-          <head>
-            <title>Conectado ao WhatsApp</title>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                text-align: center;
-                padding: 50px;
-              }
-              h1 {
-                color: #4CAF50;
-              }
-            </style>
-          </head>
-          <body>
-            <h1>Você está conectado ao WhatsApp!</h1>
-            <p>O seu WhatsApp foi conectado com sucesso.</p>
-          </body>
-        </html>
-      `); // Página de conexão
-    }
+      return res.send(if (connectionStatus === "Conectado") {
+  return res.send(`<html>
+      <head>
+        <title>Conectado ao WhatsApp</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      </head>
+      <body class="d-flex flex-column align-items-center justify-content-center vh-100 text-center">
+        <div class="container">
+          <h1 class="text-success">Você está conectado ao WhatsApp!</h1>
+          <p class="lead">O seu WhatsApp foi conectado com sucesso.</p>
+        </div>
+      </body>
+    </html>`);
+}
 
-    res.send(`
-      <html>
-        <head>
-          <title>QR Code WhatsApp</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              text-align: center;
-              padding: 50px;
-            }
-            h1 {
-              color: #4CAF50;
-            }
-            .status {
-              margin-top: 20px;
-              font-size: 20px;
-              font-weight: bold;
-              color: ${connectionStatus === "Conectado" ? "green" : "red"};
-            }
-            .status-alert {
-              font-size: 16px;
-              margin-top: 10px;
-              color: ${connectionStatus === "Conectado" ? "green" : "red"};
-            }
-          </style>
-        </head>
-        <body>
-          <h1>Escaneie o QR Code para conectar</h1>
-          <img src="${qrCodeImage}" />
-          <div class="status">${connectionStatus}</div>
-          <div class="status-alert">
-            ${connectionStatus === "Conectado" ? "Você está conectado ao WhatsApp!" : "Conecte seu WhatsApp escaneando o código."}
-          </div>
-        </body>
-      </html>
-    `);
+res.send(`
+  <html>
+    <head>
+      <title>QR Code WhatsApp</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="d-flex flex-column align-items-center justify-content-center vh-100 text-center">
+      <div class="container">
+        <h1 class="text-success">Escaneie o QR Code para conectar</h1>
+        <img src="${qrCodeImage}" class="img-fluid my-3" alt="QR Code" />
+        <div class="status fs-4 fw-bold ${connectionStatus === "Conectado" ? 'text-success' : 'text-danger'}">
+          ${connectionStatus}
+        </div>
+        <div class="status-alert mt-2 fs-5 ${connectionStatus === "Conectado" ? 'text-success' : 'text-danger'}">
+          ${connectionStatus === "Conectado" ? "Você está conectado ao WhatsApp!" : "Conecte seu WhatsApp escaneando o código."}
+        </div>
+      </div>
+    </body>
+  </html>
+`);
+
   } catch (error) {
     res.send('Erro ao gerar QR Code');
   }
