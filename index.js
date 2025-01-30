@@ -61,9 +61,29 @@ app.get("/", async (req, res) => {
       await generateQRCode(); // Gera o QR Code se não houver
     }
 
-    // Se a conexão estiver estabelecida, redireciona para outra página
+    // Se a conexão estiver estabelecida, redireciona para a página "Conectado"
     if (connectionStatus === "Conectado") {
-      return res.redirect('https://bot-marcio.onrender.com/'); // Substitua pela URL desejada
+      return res.send(`
+        <html>
+          <head>
+            <title>Conectado ao WhatsApp</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 50px;
+              }
+              h1 {
+                color: #4CAF50;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>Você está conectado ao WhatsApp!</h1>
+            <p>O seu WhatsApp foi conectado com sucesso.</p>
+          </body>
+        </html>
+      `); // Página de conexão
     }
 
     res.send(`
