@@ -23,7 +23,7 @@ client.on('qr', qr => {
         }
     });
 });
-const PORT = process.env.PORT || 3002; // Mudar a porta
+const PORT = process.env.PORT || 3003; // Mudar a porta
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
