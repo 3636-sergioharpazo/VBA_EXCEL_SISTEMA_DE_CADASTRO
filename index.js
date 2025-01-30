@@ -8,7 +8,7 @@ const express = require("express");
 // Inicializa o cliente
 const client = new Client();
 const app = express();
-const port = 3001;
+const port = 3005;
 
 let qrCodeImage = "";
 
