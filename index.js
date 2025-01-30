@@ -8,7 +8,7 @@ const express = require("express");
 // Inicializa o cliente
 const client = new Client();
 const app = express();
-const port = 3005;
+
 
 let qrCodeImage = "";
 
@@ -77,7 +77,7 @@ app.get("/", (req, res) => {
     </html>
   `);
 });
-
+const port = 3001;
 // Inicia o servidor Express
 app.listen(port, () => {
     console.log(`🌐 Servidor rodando em http://localhost:${port}`);
