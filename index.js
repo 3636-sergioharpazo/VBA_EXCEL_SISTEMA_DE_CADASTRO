@@ -4,57 +4,13 @@ const qrcodeWeb = require("qrcode");
 const axios = require('axios');
 const { Client } = require('whatsapp-web.js');
 const express = require("express");
-const net = require('net');
 
 // Inicializa o cliente
 const client = new Client();
 const app = express();
+const port = 3001;
 
-// Função para verificar se a porta está em uso
-function checkPortAvailability(port, callback) {
-    const server = net.createServer();
-    server.unref();
-    server.on('error', () => callback(false));
-
-    server.listen(port, () => {
-        server.close(() => callback(true));
-    });
-}
-
-// Verifica a disponibilidade da porta inicial
-let PORT = 3004;
-checkPortAvailability(PORT, (isAvailable) => {
-    if (!isAvailable) {
-        // Se a porta 3004 estiver em uso, tentamos portas superiores
-        let newPort = 3005;
-        let foundPort = false;
-
-        const tryNextPort = (portToTry) => {
-            checkPortAvailability(portToTry, (isAvailable) => {
-                if (isAvailable) {
-                    PORT = portToTry;
-                    foundPort = true;
-                    app.listen(PORT, () => {
-                        console.log(`Servidor rodando na porta ${PORT}`);
-                    });
-                    console.log(`Usando a porta ${PORT}...`);
-                } else {
-                    // Se a porta não estiver disponível, tenta a próxima
-                    if (!foundPort) {
-                        tryNextPort(portToTry + 1);
-                    }
-                }
-            });
-        };
-        
-        tryNextPort(newPort);
-    } else {
-        // Se a porta 3004 estiver disponível, usa ela
-        app.listen(PORT, () => {
-            console.log(`Servidor rodando na porta ${PORT}`);
-        });
-    }
-});
+let qrCodeImage = "";
 
 // Serviço de leitura do QR Code (Terminal e Web)
 client.on('qr', qr => {
@@ -66,11 +22,6 @@ client.on('qr', qr => {
             qrCodeImage = url;
         }
     });
-});
-
-// Evento quando o bot estiver pronto
-client.on("ready", () => {
-    console.log("✅ Bot conectado ao WhatsApp!");
 });
 
 
