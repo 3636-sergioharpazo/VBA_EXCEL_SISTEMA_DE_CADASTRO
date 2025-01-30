@@ -489,31 +489,33 @@ if (msg.body === '2' && msg.from.endsWith('@c.us')) {
         `Digite a *Data:*  (Formato: 📅 DD/MM/AAAA)\n\n` +
          `Digite *Menu* para retornar ao menu principal.`
     );
-    cliente_nome = await solicitarCampo(
-        cliente_nome, 
-        '❌ Nome inválido. Por favor, envie seu nome completo sem números.', 
-        /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/,  // Aceita apenas letras e espaços
-        'Nome recebido'
-    );
-    if (!cliente_nome) return;
-    
-    servico_id = await solicitarCampo(
-        servico_id, 
-        `❌ Código inválido. Escolha um código válido:\n${listaServicos}`, 
-        /^[0-9]+$/, 
-        'Serviço escolhido'
-    );
-    if (!servico_id) return;
-    
-    data_agendamento = await solicitarCampo(
-        data_agendamento, 
-        '❌ Data inválida! Envie no formato DD/MM/AAAA.', 
-        /^\d{2}\/\d{2}\/\d{4}$/, 
-        'Data recebida'
-    );
-    if (!data_agendamento) return;
-    
-    const horariosDisponiveis = await verificarDisponibilidade(servico_id, data_agendamento);
+    // Solicita o nome e valida para não conter números
+cliente_nome = await solicitarCampo(
+    null, 
+    '❌ Nome inválido. Por favor, envie seu nome completo sem números.', 
+    /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/,  // Aceita apenas letras e espaços
+    'Nome recebido'
+);
+if (!cliente_nome) return;
+
+// Solicita o serviço após o nome ser validado
+servico_id = await solicitarCampo(
+    null, 
+    `❌ Código inválido. Escolha um código válido:\n${listaServicos}`, 
+    /^[0-9]+$/, 
+    'Serviço escolhido'
+);
+if (!servico_id) return;
+
+// Solicita a data após o serviço ser validado
+data_agendamento = await solicitarCampo(
+    null, 
+    '❌ Data inválida! Envie no formato DD/MM/AAAA.', 
+    /^\d{2}\/\d{2}\/\d{4}$/, 
+    'Data recebida'
+);
+if (!data_agendamento) return;
+const horariosDisponiveis = await verificarDisponibilidade(servico_id, data_agendamento);
     
     if (horariosDisponiveis.length > 0) {
         let mensagem = `✅ *Horários disponíveis para ${data_agendamento}:*\n\n`;
