@@ -1,7 +1,20 @@
 {
-  "dependencies": {
-    "moment-timezone": "^0.5.45",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "" 
+    "name": "meu-bot-whatsapp",
+    "version": "1.0.0",
+    "description": "Bot do WhatsApp usando whatsapp-web.js",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "qrcode": "^1.5.0",
+      "whatsapp-web.js": "^1.19.4"
+    },
+    "devDependencies": {},
+    "engines": {
+      "node": ">=16"
+    },
+    "author": "Seu Nome",
+    "license": "MIT"
   }
-}
