@@ -142,10 +142,10 @@ client.on("authenticated", () => {
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 // Variáveis para armazenar os dados do cliente e do agendamento
-let cliente_nome = '';
-let data_agendamento = '';
-let horario_agendamento = '';
-let servico_id = '';
+//let cliente_nome = '';
+//let data_agendamento = '';
+//let horario_agendamento = '';
+//let servico_id = '';
 
 
 // Manipulação de mensagens
