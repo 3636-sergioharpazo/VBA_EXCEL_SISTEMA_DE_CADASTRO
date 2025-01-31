@@ -69,7 +69,7 @@ if (connectionStatus === "Conectado") {
         <script>
           setTimeout(() => {
             location.reload();
-          }, 10000);
+          }, 30000);
         </script>
       </head>
       <body class="d-flex flex-column align-items-center justify-content-center vh-100 text-center">
@@ -91,7 +91,7 @@ res.send(`
       <script>
         setTimeout(() => {
           location.reload();
-        }, 10000);
+        }, 30000);
       </script>
     </head>
     <body class="d-flex flex-column align-items-center justify-content-center vh-100 text-center">
