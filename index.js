@@ -66,6 +66,11 @@ if (connectionStatus === "Conectado") {
       <head>
         <title>Conectado ao WhatsApp</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script>
+          setTimeout(() => {
+            location.reload();
+          }, 50000);
+        </script>
       </head>
       <body class="d-flex flex-column align-items-center justify-content-center vh-100 text-center">
         <div class="container">
@@ -83,6 +88,11 @@ res.send(`
     <head>
       <title>QR Code WhatsApp</title>
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <script>
+        setTimeout(() => {
+          location.reload();
+        }, 50000);
+      </script>
     </head>
     <body class="d-flex flex-column align-items-center justify-content-center vh-100 text-center">
       <div class="container">
@@ -98,7 +108,6 @@ res.send(`
     </body>
   </html>
 `);
-
 
   } catch (error) {
     res.send('Erro ao gerar QR Code');
