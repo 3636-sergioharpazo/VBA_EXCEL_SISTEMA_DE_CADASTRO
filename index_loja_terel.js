@@ -162,16 +162,25 @@ client.on('message', async msg => {
         let cliente_telefone = msg.from.split('@')[0];
         let cliente_nome = name;
 
-        let loja1= "Loja01";
-        let loja2="Loja02";
-        
+        let loja1 = "Loja01";
+        let loja2 = "Loja02";
+
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
 
         await client.sendMessage(
             msg.from,
-            `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
+            `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Você é da região do Grajaú? Responda com "Sim" ou "Não".`
+        );
+    }
+
+    // Lógica para escolher a loja com base na resposta
+    if (/^(sim|Sim)$/i.test(msg.body)) {
+        const lojaSelecionada = "Loja01";
+        await client.sendMessage(
+            msg.from,
+            `Você escolheu a *Loja 1*. Aqui estão as opções para você:\n\n` +
             `1️⃣ - Serviços e preços\n` +
             `2️⃣ - Ganhar brindes\n` +
             `3️⃣ - Promoções da semana\n` +
@@ -179,72 +188,39 @@ client.on('message', async msg => {
             `5️⃣ - Outras dúvidas\n` +
             `6️⃣ - Consultar agendamento`
         );
-      
-        let usuario_responsavel = "";
-        let endereco_cliente = "";
-
-        let endereco_loja1 = "R. Michel Alexandre Mutran, 01 - Jardim Beatriz, São Paulo - SP, 04835-060, Brasil";
-        let endereco_loja2 = "Outro endereço da loja 2";
-
-        function getAddress(lat, lon) {
-            var xhr = new XMLHttpRequest();
-            var url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyB0EkQiKciQZolVYiBtjI8KUkch0SvAEKQ`;
-
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if (response.status == "OK") {
-                        endereco_cliente = response.results[0].formatted_address;
-                        document.getElementById('endereco').value = endereco_cliente;
-                        verificarEndereco();
-                    } else {
-                        alert("Não foi possível obter o endereço.");
-                    }
-                }
-            };
-            xhr.send();
-        }
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    getAddress(position.coords.latitude, position.coords.longitude);
-                });
-            } else {
-                alert("Geolocalização não suportada pelo navegador.");
-            }
-        }
-
-        function verificarEndereco() {
-            if (endereco_cliente === endereco_loja1) {
-                usuario_responsavel = "Loja01";
-                dispararCadastro(usuario_responsavel);
-            } else if (endereco_cliente === endereco_loja2) {
-                usuario_responsavel = "Loja02";
-                dispararCadastro(usuario_responsavel);
-            } else {
-                console.log("Endereço do cliente não corresponde a nenhuma loja.");
-            }
-        }
-
-        async function dispararCadastro(loja) {
-            try {
-                const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                    cliente_nome,
-                    cliente_telefone,
-                    usuario_responsavel: loja
-                });
-                console.log("Cadastro disparado com sucesso para", loja);
-            } catch (error) {
-                await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
-            }
-        }
-
-        getLocation();
-      
+        // Ação de direcionamento ou cadastro para a Loja 1, se necessário
+        await dispararCadastro(lojaSelecionada);
     }
 
+    if (/^(não|Não)$/i.test(msg.body)) {
+        const lojaSelecionada = "Loja02";
+        await client.sendMessage(
+            msg.from,
+            `Você escolheu a *Loja 2*. Aqui estão as opções para você:\n\n` +
+            `1️⃣ - Serviços e preços\n` +
+            `2️⃣ - Ganhar brindes\n` +
+            `3️⃣ - Promoções da semana\n` +
+            `4️⃣ - Localização\n` +
+            `5️⃣ - Outras dúvidas\n` +
+            `6️⃣ - Consultar agendamento`
+        );
+        // Ação de direcionamento ou cadastro para a Loja 2, se necessário
+        await dispararCadastro(lojaSelecionada);
+    }
+});
+
+async function dispararCadastro(loja) {
+    try {
+        const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+            cliente_nome,
+            cliente_telefone,
+            usuario_responsavel: loja
+        });
+        console.log("Cadastro disparado com sucesso para", loja);
+    } catch (error) {
+        await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
+    }
+}
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
