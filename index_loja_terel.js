@@ -181,10 +181,9 @@ client.on('message', async msg => {
         );
       
       let usuario_responsavel = "";
-let endereco_cliente = "Loja01";
 
 let endereco_loja1 = "Loja01";
-let endereco_loja2 = "Outro endereço da loja 2";
+let endereco_loja2 = "Loja02";
 
 // Perguntar se o cliente é da região do Grajaú
 async function perguntarRegiao() {
