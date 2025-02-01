@@ -244,7 +244,7 @@ client.on('message', async msg => {
 });
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
+        //const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
