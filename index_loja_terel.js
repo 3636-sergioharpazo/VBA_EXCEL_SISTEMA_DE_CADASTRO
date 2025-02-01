@@ -242,34 +242,40 @@ client.on('message', async msg => {
         );
     }
 });
-    // Resposta para a opção "Serviços e Preços"
-    if (msg.body === '1' && msg.from.endsWith('@c.us')) {
-        //const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
 
-        let servicosDisponiveis = {};
-        try {
-            const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
-            servicosDisponiveis = response.data.servicos;
-        } catch (error) {
-            console.error('Erro ao carregar serviços:', error);
-            await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
-            return;
-        }
-       
-        const listaServicos = Object.entries(servicosDisponiveis)
-            .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
-            .join('\n');
-       
-        await client.sendMessage(
-            msg.from,
-            `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
-            `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
-            `🔹 Digite *2* para agendar seu horário!`
-        );
+  // Função delay
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
+    // Resposta para a opção "Serviços e Preços"
+   if (msg.body === '1' && msg.from.endsWith('@c.us')) {
+    //const chat = await msg.getChat(); // Descomente esta linha se for usar o chat diretamente.
+    await delay(2000);
+    await client.sendStateTyping(); // Certifique-se de que `client` é o objeto correto, não `chat`.
+    await delay(2000);
+
+    let servicosDisponiveis = {};
+    try {
+        const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
+        servicosDisponiveis = response.data.servicos;
+    } catch (error) {
+        console.error('Erro ao carregar serviços:', error);
+        await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
+        return;
+    }
+
+    const listaServicos = Object.entries(servicosDisponiveis)
+        .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
+        .join('\n');
+
+    await client.sendMessage(
+        msg.from,
+        `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
+        `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
+        `🔹 Digite *2* para agendar seu horário!`
+    );
+}
+
 
     // Resposta para "Localização"
     if (msg.body === '4' && msg.from.endsWith('@c.us')) {
