@@ -224,11 +224,14 @@ function verificarEndereco() {
 }
 
 async function dispararCadastro(loja) {
+
+  let usuario_responsavel=loja;
+  
     try {
         const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
             cliente_nome,
             cliente_telefone,
-            usuario_responsavel: loja
+            usuario_responsavel
         });
         console.log("Cadastro disparado com sucesso para", loja);
     } catch (error) {
