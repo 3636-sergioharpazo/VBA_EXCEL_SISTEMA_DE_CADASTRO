@@ -167,14 +167,43 @@ client.on('message', async msg => {
             `6️⃣ - Consultar agendamento`
         );
       
-        let usuario_responsavel = "";
-        let endereco_cliente = "";
+       let usuario_responsavel = "";
+let endereco_cliente = "";
+let endereco_loja1 = "Loja01";
+let endereco_loja2 = "Loja02";
+let cliente_nome = name.split(" ")[0];
+let cliente_telefone = msg.from.split('@')[0];
 
-        let endereco_loja1 = "R. Michel Alexandre Mutran, 01 - Jardim Beatriz, São Paulo - SP, 04835-060, Brasil";
-        let endereco_loja2 = "Outro endereço da loja 2";
+async function perguntarRegiao() {
+    await client.sendMessage(msg.from, "Você é da região do Grajaú? (Responda 'sim' ou 'não')");
 
-       
+    client.on('message', async (resposta) => {
+        let respostaTexto = resposta.body.toLowerCase().trim();
+        
+        if (respostaTexto === "sim") {
+            usuario_responsavel = endereco_loja1;
+        } else {
+            usuario_responsavel = endereco_loja2;
+        }
 
+        try {
+            const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+                cliente_nome,
+                cliente_telefone,
+                usuario_responsavel
+            });
+
+            console.log("Cadastro disparado com sucesso para", usuario_responsavel);
+        } catch (error) {
+            await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
+        }
+    });
+}
+
+perguntarRegiao();
+
+    //final menu inicial
+    }
       
     
 
