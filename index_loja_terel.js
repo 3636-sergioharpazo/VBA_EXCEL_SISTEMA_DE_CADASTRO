@@ -149,24 +149,6 @@ let cliente_nome = '';
 
 
 // Manipulação de mensagens
-// Função delay
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Manipulação de mensagens
-// Função delay definida apenas uma vez
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Manipulação de mensagens
-// Função delay (somente uma vez)
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Manipulação de mensagens
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
 
