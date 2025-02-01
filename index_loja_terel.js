@@ -129,29 +129,15 @@ client.on("authenticated", () => {
     
 
 
-// Executa a função a cada 5 minuto para garantir precisão
-//setInterval(enviarLembretes, 5 * 60 * 1000);
-
-
-
-//});
-
-//client.initialize();
 
 // Função para criar delay
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 // Variáveis para armazenar os dados do cliente e do agendamento
 let cliente_nome = '';
-//let data_agendamento = '';
-//let horario_agendamento = '';
-//let servico_id = '';
-
 
 // Manipulação de mensagens
-// Manipulação de mensagens
-
-    client.on('message', async msg => {
+client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
 
     // Resposta ao menu inicial
@@ -163,68 +149,51 @@ let cliente_nome = '';
         let cliente_telefone = msg.from.split('@')[0];
         let cliente_nome = name;
 
-        let loja1 = "Loja01";
-        let loja2 = "Loja02";
-
+        let loja1= "Loja01";
+        let loja2="Loja02";
+        
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
 
         await client.sendMessage(
             msg.from,
-            `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Você é da região do Grajaú? Responda com "Sim" ou "Não".`
-        );
-    }
-
-    // Lógica para escolher a loja com base na resposta
-    if (/^(sim|Sim)$/i.test(msg.body)) {
-        const lojaSelecionada = "Loja01";
-        await client.sendMessage(
-            msg.from,
-            `Você escolheu a *Loja 1*. Aqui estão as opções para você:\n\n` +
+            `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
             `1️⃣ - Serviços e preços\n` +
             `2️⃣ - Ganhar brindes\n` +
             `3️⃣ - Promoções da semana\n` +
             `4️⃣ - Localização\n` +
             `5️⃣ - Outras dúvidas\n` +
-            `6️⃣ - Consultar agendamento`
+            `6️⃣ - Consultar agendamento\n\n` +
+            `Você é da loja Grajaú? Responda com 'sim' ou 'não'.`
         );
-        // Ação de direcionamento ou cadastro para a Loja 1, se necessário
-        await dispararCadastro(lojaSelecionada);
-    }
-
-    if (/^(não|Não)$/i.test(msg.body)) {
-        const lojaSelecionada = "Loja02";
-        await client.sendMessage(
-            msg.from,
-            `Você escolheu a *Loja 2*. Aqui estão as opções para você:\n\n` +
-            `1️⃣ - Serviços e preços\n` +
-            `2️⃣ - Ganhar brindes\n` +
-            `3️⃣ - Promoções da semana\n` +
-            `4️⃣ - Localização\n` +
-            `5️⃣ - Outras dúvidas\n` +
-            `6️⃣ - Consultar agendamento`
-        );
-        // Ação de direcionamento ou cadastro para a Loja 2, se necessário
-        await dispararCadastro(lojaSelecionada);
-    }
-});
-
-async function dispararCadastro(loja) {
-    try {
-        const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-            cliente_nome,
-            cliente_telefone,
-            usuario_responsavel: loja
+        
+        let usuario_responsavel = "";
+        let endereco_cliente = "";
+        
+        let valor_loja1 = "R$ 100,00";  // Valor para a Loja 1
+        let valor_loja2 = "R$ 150,00";  // Valor para a Loja 2
+        
+        // Perguntar se é da loja Grajaú
+        async function verificarLoja(resposta) {
+            if (resposta.toLowerCase() === 'sim') {
+                usuario_responsavel = "Loja01";
+                await client.sendMessage(msg.from, `Você é da loja Grajaú. O valor é ${valor_loja1}.`);
+            } else if (resposta.toLowerCase() === 'não') {
+                usuario_responsavel = "Loja02";
+                await client.sendMessage(msg.from, `Você não é da loja Grajaú. O valor é ${valor_loja2}.`);
+            } else {
+                await client.sendMessage(msg.from, 'Resposta inválida. Por favor, responda com "sim" ou "não".');
+            }
+        }
+        
+        // Exemplo de como você pode capturar a resposta do cliente
+        client.on('message', (message) => {
+            if (message.body.toLowerCase() === 'sim' || message.body.toLowerCase() === 'não') {
+                verificarLoja(message.body);
+            }
         });
-        console.log("Cadastro disparado com sucesso para", loja);
-    } catch (error) {
-        await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
-    }
-}
-//const delay = ms => new Promise(res => setTimeout(res, ms));
-
-       
+        
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
