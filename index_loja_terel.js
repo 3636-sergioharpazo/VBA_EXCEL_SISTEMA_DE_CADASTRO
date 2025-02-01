@@ -222,7 +222,7 @@ async function dispararCadastro(loja) {
         await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
     }
 }
-const delay = ms => new Promise(res => setTimeout(res, ms));
+//const delay = ms => new Promise(res => setTimeout(res, ms));
 
        
     // Resposta para a opção "Serviços e Preços"
