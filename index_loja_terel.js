@@ -149,7 +149,6 @@ let cliente_nome = '';
 
 
 // Manipulação de mensagens
-// Manipulação de mensagens
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
 
@@ -221,9 +220,10 @@ async function dispararCadastro(loja) {
         await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
     }
 }
+
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
-        //const chat = await msg.getChat();
+        const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
