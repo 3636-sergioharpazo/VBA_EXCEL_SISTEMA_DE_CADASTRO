@@ -137,91 +137,59 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 let cliente_nome = '';
 
 // Manipulação de mensagens
-client.on('message', async msg => {
-    const cliente_telefone = msg.from.split('@')[0];
+await client.sendMessage(
+    msg.from,
+    `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
+    `1️⃣ - Serviços e preços\n` +
+    `2️⃣ - Ganhar brindes\n` +
+    `3️⃣ - Promoções da semana\n` +
+    `4️⃣ - Localização\n` +
+    `5️⃣ - Outras dúvidas\n` +
+    `6️⃣ - Consultar agendamento\n\n` +
+    `Você é da loja Grajaú? Responda com 'sim' ou 'não'.`
+);
 
-    // Resposta ao menu inicial
-    if (/^(menu|Menu|dia|tarde|noite|oi|Oi|Voltar|voltar|Olá|olá|ola|Ola)$/i.test(msg.body) && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
-        const contact = await msg.getContact();
-        const name = contact.pushname || "Cliente";
+let usuario_responsavel = "";
+let endereco_cliente = "";
 
-        let cliente_telefone = msg.from.split('@')[0];
-        let cliente_nome = name;
+let valor_loja1 = "R$ 100,00";  // Valor para a Loja 1
+let valor_loja2 = "R$ 150,00";  // Valor para a Loja 2
 
-        let loja1= "Loja01";
-        let loja2="Loja02";
-        
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        await client.sendMessage(
-            msg.from,
-            `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
-            `1️⃣ - Serviços e preços\n` +
-            `2️⃣ - Ganhar brindes\n` +
-            `3️⃣ - Promoções da semana\n` +
-            `4️⃣ - Localização\n` +
-            `5️⃣ - Outras dúvidas\n` +
-            `6️⃣ - Consultar agendamento\n\n` +
-            `Você é da loja Grajaú? Responda com 'sim' ou 'não'.`
-        );
-        
-        let usuario_responsavel = "";
-        let endereco_cliente = "";
-        
-        let valor_loja1 = "R$ 100,00";  // Valor para a Loja 1
-        let valor_loja2 = "R$ 150,00";  // Valor para a Loja 2
-        
-        // Perguntar se é da loja Grajaú
-        async function verificarLoja(resposta) {
-            if (resposta.toLowerCase() === 'sim') {
-                usuario_responsavel = "Loja01";
-                await client.sendMessage(msg.from, `Você é da loja Grajaú. O valor é ${valor_loja1}.`);
-            } else if (resposta.toLowerCase() === 'não') {
-                usuario_responsavel = "Loja02";
-                await client.sendMessage(msg.from, `Você não é da loja Grajaú. O valor é ${valor_loja2}.`);
-            } else {
-                await client.sendMessage(msg.from, 'Resposta inválida. Por favor, responda com "sim" ou "não".');
-            }
-        }
-        
-        // Exemplo de como você pode capturar a resposta do cliente
-        client.on('message', (message) => {
-            if (message.body.toLowerCase() === 'sim' || message.body.toLowerCase() === 'não') {
-                verificarLoja(message.body);
-            }
-        });
-        
-    // Resposta para a opção "Serviços e Preços"
-    if (msg.body === '1' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        let servicosDisponiveis = {};
-        try {
-            const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
-            servicosDisponiveis = response.data.servicos;
-        } catch (error) {
-            console.error('Erro ao carregar serviços:', error);
-            await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
-            return;
-        }
-       
-        const listaServicos = Object.entries(servicosDisponiveis)
-            .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
-            .join('\n');
-       
-        await client.sendMessage(
-            msg.from,
-            `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
-            `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
-            `🔹 Digite *2* para agendar seu horário!`
-        );
+// Função para verificar se é da loja Grajaú e enviar os dados via POST
+async function verificarLoja(resposta, cliente_nome, cliente_telefone) {
+    if (resposta.toLowerCase() === 'sim') {
+        usuario_responsavel = "Loja01";
+        await client.sendMessage(msg.from, `Você é da loja Grajaú. O valor é ${valor_loja1}.`);
+    } else if (resposta.toLowerCase() === 'não') {
+        usuario_responsavel = "Loja02";
+        await client.sendMessage(msg.from, `Você não é da loja Grajaú. O valor é ${valor_loja2}.`);
+    } else {
+        await client.sendMessage(msg.from, 'Resposta inválida. Por favor, responda com "sim" ou "não".');
+        return;
     }
+
+    // Enviar os dados via POST para o servidor
+    try {
+        const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+            cliente_nome: cliente_nome,
+            cliente_telefone: cliente_telefone,
+            usuario_responsavel: usuario_responsavel
+        });
+        console.log("Cadastro disparado com sucesso para", usuario_responsavel);
+    } catch (error) {
+        await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
+    }
+}
+
+// Exemplo de como você pode capturar a resposta do cliente e passar os parâmetros para a função
+client.on('message', (message) => {
+    const cliente_nome = "João Silva";  // Substitua com o nome real do cliente
+    const cliente_telefone = "11987654321";  // Substitua com o telefone real do cliente
+
+    if (message.body.toLowerCase() === 'sim' || message.body.toLowerCase() === 'não') {
+        verificarLoja(message.body, cliente_nome, cliente_telefone);
+    }
+});
 
     // Resposta para "Localização"
     if (msg.body === '4' && msg.from.endsWith('@c.us')) {
@@ -239,10 +207,7 @@ client.on('message', async msg => {
         );
     }
 
-    // Função delay
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+  
     
     // Resposta para "Promoções da Semana"
     if (msg.body === '3' && msg.from.endsWith('@c.us')) {
