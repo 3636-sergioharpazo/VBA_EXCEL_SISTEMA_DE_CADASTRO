@@ -155,6 +155,12 @@ function delay(ms) {
 }
 
 // Manipulação de mensagens
+// Função delay definida apenas uma vez
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Manipulação de mensagens
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
 
@@ -164,8 +170,11 @@ client.on('message', async msg => {
         const contact = await msg.getContact();
         const name = contact.pushname || "Cliente";
 
-        let loja1= "Loja01";
-        let loja2="Loja02";
+        let cliente_telefone = msg.from.split('@')[0];
+        let cliente_nome = name;
+
+        let loja1 = "Loja01";
+        let loja2 = "Loja02";
         
         await delay(2000);
         await chat.sendStateTyping();
@@ -244,11 +253,10 @@ client.on('message', async msg => {
         );
     }
 
-    // Respostas para as opções de menu
+    // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat(); 
         await delay(2000);
-        await chat.sendStateTyping();
+        await client.sendStateTyping(); // Certifique-se de que `client` é o objeto correto, não `chat`.
         await delay(2000);
 
         let servicosDisponiveis = {};
@@ -441,3 +449,47 @@ client.on('message', async msg => {
         })();
     }
 });
+
+// Enviar lembretes para agendamentos
+const agendamentosNotificados = new Set();
+
+async function enviarLembretes() {
+    try {
+        const response = await axios.get('https://antoniooliveira.shop/consultar-agendamentos.php');
+
+        if (!response.data || !Array.isArray(response.data.agendamentos) || response.data.agendamentos.length === 0) {
+            console.log('⚠️ Nenhum agendamento encontrado.');
+            return;
+        }
+
+        const agendamentos = response.data.agendamentos;
+        for (let i = 0; i < agendamentos.length; i++) {
+            const agendamento = agendamentos[i];
+
+            // Verifica se o agendamento já foi notificado
+            if (agendamentosNotificados.has(agendamento.protocolo)) {
+                continue;
+            }
+
+            const { nome_cliente, telefone_cliente, data_agendamento, protocolo } = agendamento;
+
+            if (nome_cliente && telefone_cliente && data_agendamento) {
+                const mensagem = `🔔 Lembrete: Seu agendamento está chegando! \n\n` +
+                    `*Protocolo:* ${protocolo}\n` +
+                    `*Nome:* ${nome_cliente}\n` +
+                    `*Data:* ${data_agendamento}\n` +
+                    `*Telefone:* ${telefone_cliente}\n\n` +
+                    `🔔 *Você está agendado para o atendimento!*`;
+
+                // Enviar mensagem
+                await client.sendMessage(telefone_cliente, mensagem);
+                agendamentosNotificados.add(protocolo);
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao enviar lembretes:', error);
+    }
+}
+
+// Lembretes a cada 24 horas
+//setInterval(enviarLembretes, 24 * 60 * 60 * 1000); // 24 horas
