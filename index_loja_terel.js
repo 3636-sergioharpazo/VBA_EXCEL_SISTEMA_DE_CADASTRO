@@ -146,7 +146,7 @@ client.on('message', async msg => {
         const contact = await msg.getContact();
         const name = contact.pushname || "Cliente";
 
-        let cliente_telefone = msg.from.split('@')[0];
+       
         let cliente_nome = name;
 
         let loja1= "Loja01";
