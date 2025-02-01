@@ -529,7 +529,7 @@ if (msg.body === '2' && msg.from.endsWith('@c.us')) {
 
 //final do menu 2
 
-})
+}
 
 const agendamentosNotificados = new Set();
 
