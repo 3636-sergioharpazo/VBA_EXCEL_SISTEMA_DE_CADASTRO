@@ -181,40 +181,12 @@ client.on('message', async msg => {
         );
       
         let usuario_responsavel = "";
-        let endereco_cliente = "";
+       let endereco_cliente = "Loja01";
 
-        let endereco_loja1 = "R. Michel Alexandre Mutran, 01 - Jardim Beatriz, São Paulo - SP, 04835-060, Brasil";
+        let endereco_loja1 = "Loja01;
         let endereco_loja2 = "Outro endereço da loja 2";
 
-        function getAddress(lat, lon) {
-            var xhr = new XMLHttpRequest();
-            var url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyB0EkQiKciQZolVYiBtjI8KUkch0SvAEKQ`;
-
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if (response.status == "OK") {
-                        endereco_cliente = response.results[0].formatted_address;
-                        document.getElementById('endereco').value = endereco_cliente;
-                        verificarEndereco();
-                    } else {
-                        alert("Não foi possível obter o endereço.");
-                    }
-                }
-            };
-            xhr.send();
-        }
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    getAddress(position.coords.latitude, position.coords.longitude);
-                });
-            } else {
-                alert("Geolocalização não suportada pelo navegador.");
-            }
-        }
+      
 
         function verificarEndereco() {
             if (endereco_cliente === endereco_loja1) {
