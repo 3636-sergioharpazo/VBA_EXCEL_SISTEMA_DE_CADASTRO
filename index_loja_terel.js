@@ -601,12 +601,10 @@ if (!cliente_nome) return;
 
 
 
-}
-
-
-
-
 })
+
+
+
 
 const agendamentosNotificados = new Set();
 
