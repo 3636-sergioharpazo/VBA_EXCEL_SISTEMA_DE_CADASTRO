@@ -179,6 +179,7 @@ client.on('message', async (resposta) => {
 
     try {
         const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+          cliente_nome,
             cliente_telefone,
             usuario_responsavel
         });
