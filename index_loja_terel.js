@@ -599,9 +599,9 @@ if (!cliente_nome) return;
 
 //final do menu 2
 
+}
 
-
-})
+}
     
 
 
