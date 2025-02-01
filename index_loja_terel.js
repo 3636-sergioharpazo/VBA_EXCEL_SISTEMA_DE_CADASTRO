@@ -37,7 +37,7 @@ function generateQRCode() {
     });
   });
 }
-
+const delay = ms => new Promise(res => setTimeout(res, ms));
 // Quando o cliente estiver pronto
 client.on("ready", () => {
     console.log('Tudo certo! WhatsApp conectado.');
@@ -285,7 +285,10 @@ if (msg.body === '4' && msg.from.endsWith('@c.us')) {
         `Estamos ansiosos para sua visita! 😊`
     );
 }
-
+// Função delay
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 // Resposta para "Promoções da Semana"
 if (msg.body === '3' && msg.from.endsWith('@c.us')) {
     const chat = await msg.getChat();
