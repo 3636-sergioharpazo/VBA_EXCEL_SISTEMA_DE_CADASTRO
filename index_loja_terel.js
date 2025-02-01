@@ -139,7 +139,7 @@ client.on("authenticated", () => {
 //client.initialize();
 
 // Função para criar delay
-const delay = ms => new Promise(res => setTimeout(res, ms));
+//const delay = ms => new Promise(res => setTimeout(res, ms));
 
 // Variáveis para armazenar os dados do cliente e do agendamento
 let cliente_nome = '';
