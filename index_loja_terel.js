@@ -149,6 +149,11 @@ let cliente_nome = '';
 
 
 // Manipulação de mensagens
+// Função delay
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Manipulação de mensagens
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
@@ -158,9 +163,6 @@ client.on('message', async msg => {
         const chat = await msg.getChat();
         const contact = await msg.getContact();
         const name = contact.pushname || "Cliente";
-
-        let cliente_telefone = msg.from.split('@')[0];
-        let cliente_nome = name;
 
         let loja1= "Loja01";
         let loja2="Loja02";
@@ -241,41 +243,35 @@ client.on('message', async msg => {
             `6️⃣ - Consultar brindes`
         );
     }
-});
 
-  // Função delay
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    // Respostas para as opções de menu
+    if (msg.body === '1' && msg.from.endsWith('@c.us')) {
+        const chat = await msg.getChat(); 
+        await delay(2000);
+        await chat.sendStateTyping();
+        await delay(2000);
+
+        let servicosDisponiveis = {};
+        try {
+            const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
+            servicosDisponiveis = response.data.servicos;
+        } catch (error) {
+            console.error('Erro ao carregar serviços:', error);
+            await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
+            return;
+        }
+
+        const listaServicos = Object.entries(servicosDisponiveis)
+            .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
+            .join('\n');
+
+        await client.sendMessage(
+            msg.from,
+            `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
+            `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
+            `🔹 Digite *2* para agendar seu horário!`
+        );
     }
-    // Resposta para a opção "Serviços e Preços"
-   if (msg.body === '1' && msg.from.endsWith('@c.us')) {
-    //const chat = await msg.getChat(); // Descomente esta linha se for usar o chat diretamente.
-    await delay(2000);
-    await client.sendStateTyping(); // Certifique-se de que `client` é o objeto correto, não `chat`.
-    await delay(2000);
-
-    let servicosDisponiveis = {};
-    try {
-        const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
-        servicosDisponiveis = response.data.servicos;
-    } catch (error) {
-        console.error('Erro ao carregar serviços:', error);
-        await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
-        return;
-    }
-
-    const listaServicos = Object.entries(servicosDisponiveis)
-        .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
-        .join('\n');
-
-    await client.sendMessage(
-        msg.from,
-        `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
-        `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
-        `🔹 Digite *2* para agendar seu horário!`
-    );
-}
-
 
     // Resposta para "Localização"
     if (msg.body === '4' && msg.from.endsWith('@c.us')) {
@@ -293,11 +289,6 @@ client.on('message', async msg => {
         );
     }
 
-    // Função delay
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
     // Resposta para "Promoções da Semana"
     if (msg.body === '3' && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
@@ -450,60 +441,3 @@ client.on('message', async msg => {
         })();
     }
 });
-
-
-
-const agendamentosNotificados = new Set();
-
-async function enviarLembretes() {
-    try {
-        const response = await axios.get('https://antoniooliveira.shop/consultar-agendamentos.php');
-
-        if (!response.data || !Array.isArray(response.data.agendamentos) || response.data.agendamentos.length === 0) {
-            console.log('⚠️ Nenhum agendamento encontrado.');
-            return;
-        }
-
-        const agendamentos = response.data.agendamentos;
-
-        for (const agendamento of agendamentos) {
-            const { cliente_telefone, cliente_nome, servico, data_agendamento, horario_agendamento } = agendamento;
-
-            if (![cliente_telefone, cliente_nome, servico, data_agendamento, horario_agendamento].every(Boolean)) {
-                console.log(`⚠️ Dados incompletos para um agendamento. Verifique na plataforma. Dados:`, agendamento);
-                continue;
-            }
-
-            // Formatar data e hora
-            const dataObj = new Date(`${data_agendamento}T${horario_agendamento}`);
-
-            if (isNaN(dataObj)) {
-                console.log(`❌ Erro ao processar data para ${cliente_telefone}: ${data_agendamento} ${horario_agendamento}`);
-                continue;
-            }
-
-            const dataFormatada = dataObj.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-            const horaFormatada = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-
-            const chaveUnica = `${cliente_telefone}-${dataFormatada}-${horaFormatada}`;
-            if (agendamentosNotificados.has(chaveUnica)) {
-                console.log(`⏳ Lembrete já enviado para ${cliente_telefone}, ignorando...`);
-                continue;
-            }
-
-            const mensagem = `🔔 Olá, ${cliente_nome}! Lembrete do seu agendamento:\n\n📅 Data: ${dataFormatada}\n🕒 Horário: ${horaFormatada}\n💇 Serviço: ${servico}\n\nEstamos te esperando! 😊`;
-
-            if (!client || !client.sendMessage) {
-                console.error('❌ Erro: client.sendMessage não está definido. Verifique a conexão do bot.');
-                return;
-            }
-
-            const numeroWhatsApp = `${cliente_telefone}@c.us`;
-            await client.sendMessage(numeroWhatsApp, mensagem);
-            agendamentosNotificados.add(chaveUnica);
-            console.log(`📩 Lembrete enviado para ${cliente_telefone}`);
-        }
-    } catch (error) {
-        console.error('❌ Erro ao buscar agendamentos:', error.message || error);
-    }
-}
