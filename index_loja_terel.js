@@ -173,7 +173,10 @@ client.on('message', async msg => {
         let endereco_loja1 = "R. Michel Alexandre Mutran, 01 - Jardim Beatriz, São Paulo - SP, 04835-060, Brasil";
         let endereco_loja2 = "Outro endereço da loja 2";
 
-        
+       
+
+      
+    
 
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
