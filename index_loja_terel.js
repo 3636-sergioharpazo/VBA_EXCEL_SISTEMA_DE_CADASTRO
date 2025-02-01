@@ -161,6 +161,12 @@ function delay(ms) {
 }
 
 // Manipulação de mensagens
+// Função delay (somente uma vez)
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Manipulação de mensagens
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
 
@@ -173,8 +179,8 @@ client.on('message', async msg => {
         let cliente_telefone = msg.from.split('@')[0];
         let cliente_nome = name;
 
-        let loja1 = "Loja01";
-        let loja2 = "Loja02";
+        let loja1= "Loja01";
+        let loja2="Loja02";
         
         await delay(2000);
         await chat.sendStateTyping();
@@ -252,244 +258,151 @@ client.on('message', async msg => {
             `6️⃣ - Consultar brindes`
         );
     }
+});
 
-    // Resposta para a opção "Serviços e Preços"
-    if (msg.body === '1' && msg.from.endsWith('@c.us')) {
+// Resposta para a opção "Serviços e Preços"
+if (msg.body === '1' && msg.from.endsWith('@c.us')) {
+    await delay(2000);
+    await client.sendStateTyping(); // Certifique-se de que `client` é o objeto correto, não `chat`.
+    await delay(2000);
+
+    let servicosDisponiveis = {};
+    try {
+        const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
+        servicosDisponiveis = response.data.servicos;
+    } catch (error) {
+        console.error('Erro ao carregar serviços:', error);
+        await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
+        return;
+    }
+
+    const listaServicos = Object.entries(servicosDisponiveis)
+        .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
+        .join('\n');
+
+    await client.sendMessage(
+        msg.from,
+        `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
+        `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
+        `🔹 Digite *2* para agendar seu horário!`
+    );
+}
+
+// Resposta para "Localização"
+if (msg.body === '4' && msg.from.endsWith('@c.us')) {
+    const chat = await msg.getChat();
+    await delay(2000);
+    await chat.sendStateTyping();
+    await delay(2000);
+
+    await client.sendMessage(
+        msg.from,
+        `📍 *Localização das Lojas Terel* 📍\n\n` +
+        `Endereço: Vila São José, Centro\n` +
+        `Cidade: São Paulo - SP\n\n` +
+        `Estamos ansiosos para sua visita! 😊`
+    );
+}
+
+// Resposta para "Promoções da Semana"
+if (msg.body === '3' && msg.from.endsWith('@c.us')) {
+    const chat = await msg.getChat();
+    await delay(2000);
+    await chat.sendStateTyping();
+    await delay(2000);
+
+    let servicosDisponiveis = {};
+    try {
+        const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot_p.php');
+        servicosDisponiveis = response.data.servicos;
+    } catch (error) {
+        console.error('Erro ao carregar serviços:', error);
+        await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
+        return;
+    }
+
+    const listaServicos = Object.entries(servicosDisponiveis)
+        .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
+        .join('\n');
+
+    await client.sendMessage(
+        msg.from,
+        `🎉 *Promoções da Semana* 🎉\n\n` +
+        `📝\n${listaServicos}\n` +
+        `Aproveite essas ofertas incríveis! Válidas até sábado. 💅\n\n` + 
+        `Digite *2* para agendar seu horário!\n`
+    );
+}
+
+// Resposta para "Outras Dúvidas"
+if (msg.body === '5' && msg.from.endsWith('@c.us')) {
+    const chat = await msg.getChat();
+    await delay(2000);
+    await chat.sendStateTyping();
+    await delay(2000);
+
+    await client.sendMessage(
+        msg.from,
+        `❓ *Outras Dúvidas* ❓\n\n` +
+        `Por favor, descreva sua dúvida que entraremos em contato para ajudá-lo(a).`
+    );
+}
+
+// Menu 2
+if (msg.body === '2' && msg.from.endsWith('@c.us')) {
+    (async () => {
+        const chat = await msg.getChat();
+        await chat.sendStateTyping();
         await delay(2000);
-        await client.sendStateTyping(); // Certifique-se de que `client` é o objeto correto, não `chat`.
-        await delay(2000);
+
+        let cliente_nome = '';
+        let cliente_telefone = msg.from.split('@')[0];
+        let protocolo = '';
+        let confirmacao = false;
+
+        async function solicitarCampo(campo, mensagemValidacao, regex = null, mensagemConfirmacao = '') {
+            let campoValido = false;
+            while (!campoValido) {
+                if (!campo || (regex && typeof campo === 'string' && !regex.test(campo))) {
+                    await client.sendMessage(msg.from, mensagemValidacao);
+                    const resposta = await esperarMensagem(msg.from);
+                    
+                    if (resposta.trim().toLowerCase() === 'menu') {
+                        await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
+                        return null;
+                    }
+                    campo = resposta.trim();
+                } else {
+                    campoValido = true;
+                }
+            }
+
+            if (mensagemConfirmacao) {
+                await client.sendMessage(msg.from, `✅ ${mensagemConfirmacao}: ${campo}`);
+            }
+            return campo;
+        }
+
+        async function esperarMensagem(user) {
+            return new Promise((resolve) => {
+                const listener = (response) => {
+                    if (response.from === user) {
+                        client.off('message', listener);
+                        resolve(response.body);
+                    }
+                };
+                client.on('message', listener);
+            });
+        }
 
         let servicosDisponiveis = {};
         try {
             const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
             servicosDisponiveis = response.data.servicos;
         } catch (error) {
-            console.error('Erro ao carregar serviços:', error);
-            await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
-            return;
+            console.error("Erro ao buscar serviços:", error);
+            await client.sendMessage(msg.from, '❌ Erro ao buscar serviços. Tente novamente.');
         }
-
-        const listaServicos = Object.entries(servicosDisponiveis)
-            .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
-            .join('\n');
-
-        await client.sendMessage(
-            msg.from,
-            `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
-            `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
-            `🔹 Digite *2* para agendar seu horário!`
-        );
-    }
-
-    // Resposta para "Localização"
-    if (msg.body === '4' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        await client.sendMessage(
-            msg.from,
-            `📍 *Localização das Lojas Terel* 📍\n\n` +
-            `Endereço: Vila São José, Centro\n` +
-            `Cidade: São Paulo - SP\n\n` +
-            `Estamos ansiosos para sua visita! 😊`
-        );
-    }
-
-    // Resposta para "Promoções da Semana"
-    if (msg.body === '3' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        let servicosDisponiveis = {};
-        try {
-            const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot_p.php');
-            servicosDisponiveis = response.data.servicos;
-        } catch (error) {
-            console.error('Erro ao carregar serviços:', error);
-            await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
-            return;
-        }
-
-        const listaServicos = Object.entries(servicosDisponiveis)
-            .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
-            .join('\n');
-
-        await client.sendMessage(
-            msg.from,
-            `🎉 *Promoções da Semana* 🎉\n\n` +
-            `📝\n${listaServicos}\n` +
-            `Aproveite essas ofertas incríveis! Válidas até sábado. 💅\n\n` + 
-            `Digite *2* para agendar seu horário!\n`
-        );
-    }
-
-    // Resposta para "Outras Dúvidas"
-    if (msg.body === '5' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        await client.sendMessage(
-            msg.from,
-            `❓ *Outras Dúvidas* ❓\n\n` +
-            `Por favor, descreva sua dúvida que entraremos em contato para ajudá-lo(a).`
-        );
-    }
-
-    // Menu 2
-    if (msg.body === '2' && msg.from.endsWith('@c.us')) {
-        (async () => {
-            const chat = await msg.getChat();
-            await chat.sendStateTyping();
-            await delay(2000);
-
-            let cliente_nome = '';
-            let cliente_telefone = msg.from.split('@')[0];
-            let protocolo = '';
-            let confirmacao = false;
-
-            async function solicitarCampo(campo, mensagemValidacao, regex = null, mensagemConfirmacao = '') {
-                let campoValido = false;
-                while (!campoValido) {
-                    if (!campo || (regex && typeof campo === 'string' && !regex.test(campo))) {
-                        await client.sendMessage(msg.from, mensagemValidacao);
-                        const resposta = await esperarMensagem(msg.from);
-                        
-                        if (resposta.trim().toLowerCase() === 'menu') {
-                            await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
-                            return null;
-                        }
-                        campo = resposta.trim();
-                    } else {
-                        campoValido = true;
-                    }
-                }
-
-                if (mensagemConfirmacao) {
-                    await client.sendMessage(msg.from, `✅ ${mensagemConfirmacao}: ${campo}`);
-                }
-                return campo;
-            }
-
-            async function esperarMensagem(user) {
-                return new Promise((resolve) => {
-                    const listener = (response) => {
-                        if (response.from === user) {
-                            client.off('message', listener);
-                            resolve(response.body);
-                        }
-                    };
-                    client.on('message', listener);
-                });
-            }
-
-            let servicosDisponiveis = {};
-            try {
-                const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot.php');
-                servicosDisponiveis = response.data.servicos;
-            } catch (error) {
-                console.error("Erro ao buscar serviços:", error);
-                await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
-                return;
-            }
-
-            await client.sendMessage(msg.from, 
-                `🌟 *Ganhar brindes* 🌟\n\n` +
-                `Digite *Nome Completo:*\n\n` +
-                `Digite *Menu* para retornar ao menu principal.`
-            );
-
-            cliente_nome = await solicitarCampo(
-                null, 
-                '❌ Nome inválido. Por favor, envie seu nome completo sem números.', 
-                /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/,
-                'Nome recebido'
-            );
-
-            if (!cliente_nome) return;
-
-            await client.sendMessage(msg.from,
-                `📝 Confirme as informações:\n\n` +
-                `Nome: ${cliente_nome}\n` +
-                `Digite *Sim* ✅ para confirmar\nDigite *Cancelar* ❌ para cancelar e voltar ao menu principal\nDigite *Menu* para retornar ao menu principal.`
-            );
-
-            const resposta = await esperarMensagem(msg.from);
-            if (resposta.trim().toLowerCase() !== 'sim') {
-                await client.sendMessage(msg.from, '❌ Agendamento cancelado. Retornando ao menu principal.');
-                return;
-            }
-
-            try {
-                const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                    cliente_nome,
-                    cliente_telefone
-                });
-
-                protocolo = protocoloResponse.data.protocolo;
-
-                if (protocolo) {
-                    await client.sendMessage(msg.from,
-                        `✅ *Você está cadastrado e Confirmado!*\n` +
-                        `📜 *Protocolo:* ${protocolo}\n` +
-                        `👤 *Nome:* ${cliente_nome}\n`
-                    );
-                } else {
-                    await client.sendMessage(msg.from, '❌ Erro ao gerar protocolo. Tente novamente.');
-                }
-            } catch (error) {
-                console.error("Erro no cadastro:", error);
-                await client.sendMessage(msg.from, '❌ Erro ao cadastrar, tente novamente!');
-            }
-        })();
-    }
-});
-
-// Enviar lembretes para agendamentos
-const agendamentosNotificados = new Set();
-
-async function enviarLembretes() {
-    try {
-        const response = await axios.get('https://antoniooliveira.shop/consultar-agendamentos.php');
-
-        if (!response.data || !Array.isArray(response.data.agendamentos) || response.data.agendamentos.length === 0) {
-            console.log('⚠️ Nenhum agendamento encontrado.');
-            return;
-        }
-
-        const agendamentos = response.data.agendamentos;
-        for (let i = 0; i < agendamentos.length; i++) {
-            const agendamento = agendamentos[i];
-
-            // Verifica se o agendamento já foi notificado
-            if (agendamentosNotificados.has(agendamento.protocolo)) {
-                continue;
-            }
-
-            const { nome_cliente, telefone_cliente, data_agendamento, protocolo } = agendamento;
-
-            if (nome_cliente && telefone_cliente && data_agendamento) {
-                const mensagem = `🔔 Lembrete: Seu agendamento está chegando! \n\n` +
-                    `*Protocolo:* ${protocolo}\n` +
-                    `*Nome:* ${nome_cliente}\n` +
-                    `*Data:* ${data_agendamento}\n` +
-                    `*Telefone:* ${telefone_cliente}\n\n` +
-                    `🔔 *Você está agendado para o atendimento!*`;
-
-                // Enviar mensagem
-                await client.sendMessage(telefone_cliente, mensagem);
-                agendamentosNotificados.add(protocolo);
-            }
-        }
-    } catch (error) {
-        console.error('Erro ao enviar lembretes:', error);
-    }
+    })();
 }
 
-// Lembretes a cada 24 horas
-//setInterval(enviarLembretes, 24 * 60 * 60 * 1000); // 24 horas
