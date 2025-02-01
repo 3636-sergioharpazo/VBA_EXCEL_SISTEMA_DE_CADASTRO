@@ -171,7 +171,6 @@ client.on('message', async msg => {
 let endereco_cliente = "";
 let endereco_loja1 = "Loja01";
 let endereco_loja2 = "Loja02";
-let cliente_nome = name.split(" ")[0];
 let cliente_telefone = msg.from.split('@')[0];
 
 async function perguntarRegiao() {
