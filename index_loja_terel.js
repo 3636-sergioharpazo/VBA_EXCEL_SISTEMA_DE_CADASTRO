@@ -169,6 +169,67 @@ client.on('message', async msg => {
         await chat.sendStateTyping();
         await delay(2000);
 
+        // Perguntar se o cliente é da região do Grajaú antes do menu
+        await perguntarRegiao();
+    }
+
+    // Perguntar se o cliente é da região do Grajaú
+    async function perguntarRegiao() {
+        await client.sendMessage(
+            msg.from,
+            `🏠 Olá, *${name.split(" ")[0]}*! Você é da região do Grajaú? \n\n` +
+            `🔹 Digite *sim* se for da região do Grajaú ou *não* caso contrário.`
+        );
+    }
+
+    // Capturar a resposta e definir a loja
+    async function capturarResposta(resposta) {
+        let endereco_cliente;
+
+        if (resposta.toLowerCase() === "sim") {
+            endereco_cliente = "Loja01";
+        } else if (resposta.toLowerCase() === "não") {
+            endereco_cliente = "Loja02";
+        } else {
+            await client.sendMessage(
+                msg.from,
+                '❌ Resposta inválida. Por favor, responda *sim* ou *não*.'
+            );
+            return;
+        }
+
+        verificarEndereco(endereco_cliente);
+    }
+
+    // Verificar o endereço do cliente
+    function verificarEndereco(endereco_cliente) {
+        let usuario_responsavel;
+        if (endereco_cliente === "Loja01") {
+            usuario_responsavel = "Loja01";
+            dispararCadastro(usuario_responsavel);
+        } else if (endereco_cliente === "Loja02") {
+            usuario_responsavel = "Loja02";
+            dispararCadastro(usuario_responsavel);
+        } else {
+            console.log("Endereço do cliente não corresponde a nenhuma loja.");
+        }
+    }
+
+    async function dispararCadastro(loja) {
+        let usuario_responsavel = loja;
+        
+        try {
+            const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+                cliente_nome,
+                cliente_telefone,
+                usuario_responsavel
+            });
+            console.log("Cadastro disparado com sucesso para", loja);
+        } catch (error) {
+            await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
+        }
+
+        // Após o cadastro, mostrar o menu novamente
         await client.sendMessage(
             msg.from,
             `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
@@ -177,69 +238,10 @@ client.on('message', async msg => {
             `3️⃣ - Promoções da semana\n` +
             `4️⃣ - Localização\n` +
             `5️⃣ - Outras dúvidas\n` +
-            `6️⃣ - Consultar agendamento`
+            `6️⃣ - Consultar brindes`
         );
-  
-      let usuario_responsavel = "";
-
-let endereco_loja1 = "Loja01";
-let endereco_loja2 = "Loja02";
-
-// Perguntar se o cliente é da região do Grajaú
-async function perguntarRegiao() {
-    await client.sendMessage(
-        msg.from,
-        `🏠 Olá, *${name.split(" ")[0]}*! Você é da região do Grajaú? \n\n` +
-        `🔹 Digite *sim* se for da região do Grajaú ou *não* caso contrário.`
-    );
-}
-
-// Capturar a resposta e definir a loja
-async function capturarResposta(resposta) {
-    if (resposta.toLowerCase() === "sim") {
-        endereco_cliente = endereco_loja1;
-    } else if (resposta.toLowerCase() === "não") {
-        endereco_cliente = endereco_loja2;
-    } else {
-        await client.sendMessage(
-            msg.from,
-            '❌ Resposta inválida. Por favor, responda *sim* ou *não*.'
-        );
-        return;
     }
-
-    verificarEndereco();
-}
-
-function verificarEndereco() {
-    if (endereco_cliente === endereco_loja1) {
-        usuario_responsavel = "Loja01";
-        dispararCadastro(usuario_responsavel);
-    } else if (endereco_cliente === endereco_loja2) {
-        usuario_responsavel = "Loja02";
-        dispararCadastro(usuario_responsavel);
-    } else {
-        console.log("Endereço do cliente não corresponde a nenhuma loja.");
-    }
-}
-
-async function dispararCadastro(loja) {
-
-  let usuario_responsavel=loja;
-  
-    try {
-        const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-            cliente_nome,
-            cliente_telefone,
-            usuario_responsavel
-        });
-        console.log("Cadastro disparado com sucesso para", loja);
-    } catch (error) {
-        await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
-    }
-}
-          perguntarRegiao();
-    }
+});
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
