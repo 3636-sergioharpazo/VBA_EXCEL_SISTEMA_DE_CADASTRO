@@ -173,64 +173,7 @@ client.on('message', async msg => {
         let endereco_loja1 = "R. Michel Alexandre Mutran, 01 - Jardim Beatriz, São Paulo - SP, 04835-060, Brasil";
         let endereco_loja2 = "Outro endereço da loja 2";
 
-        function getAddress(lat, lon) {
-            var xhr = new XMLHttpRequest();
-            var url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyB0EkQiKciQZolVYiBtjI8KUkch0SvAEKQ`;
-
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if (response.status == "OK") {
-                        endereco_cliente = response.results[0].formatted_address;
-                        document.getElementById('endereco').value = endereco_cliente;
-                        verificarEndereco();
-                    } else {
-                        alert("Não foi possível obter o endereço.");
-                    }
-                }
-            };
-            xhr.send();
-        }
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    getAddress(position.coords.latitude, position.coords.longitude);
-                });
-            } else {
-                alert("Geolocalização não suportada pelo navegador.");
-            }
-        }
-
-        function verificarEndereco() {
-            if (endereco_cliente === endereco_loja1) {
-                usuario_responsavel = "Loja01";
-                dispararCadastro(usuario_responsavel);
-            } else if (endereco_cliente === endereco_loja2) {
-                usuario_responsavel = "Loja02";
-                dispararCadastro(usuario_responsavel);
-            } else {
-                console.log("Endereço do cliente não corresponde a nenhuma loja.");
-            }
-        }
-
-        async function dispararCadastro(loja) {
-            try {
-                const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                    cliente_nome,
-                    cliente_telefone,
-                    usuario_responsavel: loja
-                });
-                console.log("Cadastro disparado com sucesso para", loja);
-            } catch (error) {
-                await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
-            }
-        }
-
-        getLocation();
-      
-    }
+        
 
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
