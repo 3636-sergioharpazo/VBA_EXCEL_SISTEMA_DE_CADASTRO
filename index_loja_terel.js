@@ -560,20 +560,14 @@ if (msg.body === '2' && msg.from.endsWith('@c.us')) {
 
 
 
-
-
-
 const agendamentosNotificados = new Set();
 
 async function enviarLembretes() {
-   // console.log('🔔 Verificando agendamentos para enviar lembretes...');
-
     try {
         const response = await axios.get('https://antoniooliveira.shop/consultar-agendamentos.php');
-        //console.log('Resposta da API:', response.data); 
 
-        if (!response.data || !response.data.agendamentos || response.data.agendamentos.length === 0) {
-          //  console.log('⚠️ Nenhum agendamento encontrado.');
+        if (!response.data || !Array.isArray(response.data.agendamentos) || response.data.agendamentos.length === 0) {
+            console.log('⚠️ Nenhum agendamento encontrado.');
             return;
         }
 
@@ -582,32 +576,39 @@ async function enviarLembretes() {
         for (const agendamento of agendamentos) {
             const { cliente_telefone, cliente_nome, servico, data_agendamento, horario_agendamento } = agendamento;
 
-            if (!cliente_telefone || !cliente_nome || !servico || !data_agendamento || !horario_agendamento) {
-                console.log(`⚠️ Dados incompletos para o telefone: ${cliente_telefone}. Verifique na plataforma.`);
+            if (![cliente_telefone, cliente_nome, servico, data_agendamento, horario_agendamento].every(Boolean)) {
+                console.log(`⚠️ Dados incompletos para um agendamento. Verifique na plataforma. Dados:`, agendamento);
                 continue;
             }
 
-            // Converter data e horário para o formato dd/mm/aaaa HH:mm
+            // Formatar data e hora
             const dataObj = new Date(`${data_agendamento}T${horario_agendamento}`);
-            const dataFormatada = dataObj.toLocaleDateString('pt-BR');
-            const horaFormatada = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            if (isNaN(dataObj)) {
+                console.log(`❌ Erro ao processar data para ${cliente_telefone}: ${data_agendamento} ${horario_agendamento}`);
+                continue;
+            }
+
+            const dataFormatada = dataObj.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+            const horaFormatada = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 
             const chaveUnica = `${cliente_telefone}-${dataFormatada}-${horaFormatada}`;
             if (agendamentosNotificados.has(chaveUnica)) {
-               // console.log(`⏳ Lembrete já enviado para ${cliente_telefone}, ignorando...`);
+                console.log(`⏳ Lembrete já enviado para ${cliente_telefone}, ignorando...`);
                 continue;
             }
 
             const mensagem = `🔔 Olá, ${cliente_nome}! Lembrete do seu agendamento:\n\n📅 Data: ${dataFormatada}\n🕒 Horário: ${horaFormatada}\n💇 Serviço: ${servico}\n\nEstamos te esperando! 😊`;
 
-            if (client && client.sendMessage) {
-                const numeroWhatsApp = `${cliente_telefone}@c.us`;
-                await client.sendMessage(numeroWhatsApp, mensagem);
-                agendamentosNotificados.add(chaveUnica);
-              //  console.log(`📩 Lembrete enviado para ${cliente_telefone}`);
-            } else {
-                console.error('❌ Erro: client.sendMessage não está definido');
+            if (!client || !client.sendMessage) {
+                console.error('❌ Erro: client.sendMessage não está definido. Verifique a conexão do bot.');
+                return;
             }
+
+            const numeroWhatsApp = `${cliente_telefone}@c.us`;
+            await client.sendMessage(numeroWhatsApp, mensagem);
+            agendamentosNotificados.add(chaveUnica);
+            console.log(`📩 Lembrete enviado para ${cliente_telefone}`);
         }
     } catch (error) {
         console.error('❌ Erro ao buscar agendamentos:', error.message || error);
