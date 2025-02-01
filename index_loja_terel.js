@@ -189,7 +189,7 @@ let endereco_loja2 = "Loja02";
 async function perguntarRegiao() {
     await client.sendMessage(
         msg.from,
-        `🏠 * Olá, ${name.split(" ")[0]}! Você é da região do Grajaú?* \n\n` +
+        `🏠 Olá, *${name.split(" ")[0]}*! Você é da região do Grajaú? \n\n` +
         `🔹 Digite *sim* se for da região do Grajaú ou *não* caso contrário.`
     );
 }
