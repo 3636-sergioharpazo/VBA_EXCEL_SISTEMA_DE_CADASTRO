@@ -142,7 +142,7 @@ client.on("authenticated", () => {
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 // Variáveis para armazenar os dados do cliente e do agendamento
-//let cliente_nome = '';
+let cliente_nome = '';
 //let data_agendamento = '';
 //let horario_agendamento = '';
 //let servico_id = '';
@@ -158,7 +158,13 @@ client.on('message', async msg => {
         const contact = await msg.getContact();
         const name = contact.pushname || "Cliente";
 
-       
+        let cliente_telefone = msg.from.split('@')[0];
+       let cliente_nome = name;
+
+        let loja1= "Loja01";
+      let loja2="Loja02";
+      
+      
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
@@ -167,14 +173,79 @@ client.on('message', async msg => {
             msg.from,
             `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
             `1️⃣ - Serviços e preços\n` +
-            `2️⃣ - Agendar horário\n` +
+            `2️⃣ - Ganhar brindes\n` +
             `3️⃣ - Promoções da semana\n` +
             `4️⃣ - Localização\n` +
             `5️⃣ - Outras dúvidas\n` +
             `6️⃣ - Consultar agendamento`
-        );
-    }
 
+                  );
+      
+let usuario_responsavel = "";
+let endereco_cliente = "";
+
+let endereco_loja1 = "R. Michel Alexandre Mutran, 01 - Jardim Beatriz, São Paulo - SP, 04835-060, Brasil";
+let endereco_loja2 = "Outro endereço da loja 2";
+
+function getAddress(lat, lon) {
+    var xhr = new XMLHttpRequest();
+    var url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=AIzaSyB0EkQiKciQZolVYiBtjI8KUkch0SvAEKQ`;
+
+    xhr.open('GET', url, true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.status == "OK") {
+                endereco_cliente = response.results[0].formatted_address;
+                document.getElementById('endereco').value = endereco_cliente;
+                verificarEndereco();
+            } else {
+                alert("Não foi possível obter o endereço.");
+            }
+        }
+    };
+    xhr.send();
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            getAddress(position.coords.latitude, position.coords.longitude);
+        });
+    } else {
+        alert("Geolocalização não suportada pelo navegador.");
+    }
+}
+
+function verificarEndereco() {
+    if (endereco_cliente === endereco_loja1) {
+        usuario_responsavel = "Loja01";
+        dispararCadastro(usuario_responsavel);
+    } else if (endereco_cliente === endereco_loja2) {
+        usuario_responsavel = "Loja02";
+        dispararCadastro(usuario_responsavel);
+    } else {
+        console.log("Endereço do cliente não corresponde a nenhuma loja.");
+    }
+}
+
+async function dispararCadastro(loja) {
+    try {
+        const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+            cliente_nome,
+            cliente_telefone,
+            usuario_responsavel: loja
+        });
+        console.log("Cadastro disparado com sucesso para", loja);
+    } catch (error) {
+        await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
+    }
+}
+
+getLocation();
+
+
+      
     // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
@@ -219,7 +290,7 @@ client.on('message', async msg => {
         await client.sendMessage(
             msg.from,
             `📍 *Localização das Lojas Terel* 📍\n\n` +
-            `Endereço: Avenida Bela Vista, 1234, Centro\n` +
+            `Endereço: Vila São José, Centro\n` +
             `Cidade: São Paulo - SP\n\n` +
             `Estamos ansiosos para sua visita! 😊`
         );
@@ -286,14 +357,13 @@ async function handleAgendamento(msg) {
         if (response.data.encontrado) {
             const { nome, telefone, servico, data, horario } = response.data.dados;
             await client.sendMessage(msg.from, 
-                `🔍 *Detalhes do Agendamento*\n\n` +
+                `🔍 *Detalhes dos Brindes*\n\n` +
                 `📋 Código: ${codigoAgendamento}\n` +
                 `👤 Nome: ${nome}\n` +
                 `📞 Telefone: ${telefone}\n` +
-                `💇‍♀️ Serviço: ${servico}\n` +
+                `💇‍♀️ Brinde: ${servico}\n` +
                 `📅 Data: ${data}\n` +
-                `⏰ Horário: ${horario}\n\n` +
-                `📌 Se precisar de algo, digite *menu* para ver as opções.`
+                 `📌 Se precisar de algo, digite *menu* para ver as opções.`
             );
             
         } else {
@@ -313,7 +383,7 @@ if (msg.body === '6' && msg.from.endsWith('@c.us')) {
     await chat.sendStateTyping();
     await delay(2000);
 
-    client.sendMessage(msg.from, '📅 Por favor, digite o código do agendamento (protocolo) para consultar.');
+    client.sendMessage(msg.from, '📅 Por favor, digite o código do atendimento (protocolo) para consultar.');
 
     // Aguarda apenas a próxima mensagem do usuário
     const listener = async (newMsg) => {
@@ -470,11 +540,9 @@ if (msg.body === '2' && msg.from.endsWith('@c.us')) {
     
     await client.sendMessage(
         msg.from,
-        `🌟 *Agendamento de Horário* 🌟\n\n` +
+        `🌟 *Ganhar brindes* 🌟\n\n` +
         `Digite *Nome Completo:*\n\n` +
-        `Escolha *Código do Serviço:* da lista abaixo:\n\n${listaServicos}\n\n` +
-        `Digite a *Data:*  (Formato: 📅 DD/MM/AAAA)\n\n` +
-         `Digite *Menu* para retornar ao menu principal.`
+        `Digite *Menu* para retornar ao menu principal.`
     );
     // Solicita o nome e valida para não conter números
 cliente_nome = await solicitarCampo(
@@ -485,48 +553,14 @@ cliente_nome = await solicitarCampo(
 );
 if (!cliente_nome) return;
 
-// Solicita o serviço após o nome ser validado
-servico_id = await solicitarCampo(
-    null, 
-    `❌ Código inválido. Escolha um código válido:\n${listaServicos}`, 
-    /^[0-9]+$/, 
-    'Serviço escolhido'
-);
-if (!servico_id) return;
 
-// Solicita a data após o serviço ser validado
-data_agendamento = await solicitarCampo(
-    null, 
-    '❌ Data inválida! Envie no formato DD/MM/AAAA.', 
-    /^\d{2}\/\d{2}\/\d{4}$/, 
-    'Data recebida'
-);
-if (!data_agendamento) return;
-const horariosDisponiveis = await verificarDisponibilidade(servico_id, data_agendamento);
-    
-    if (horariosDisponiveis.length > 0) {
-        let mensagem = `✅ *Horários disponíveis para ${data_agendamento}:*\n\n`;
-        horariosDisponiveis.forEach(horario => {
-            mensagem += `🕒 ${horario}\n\n`;
-        });
-        mensagem += `*Escolha o seu Horário:* (Formato: ⏰ HH:mm)\n\n`;
-        await client.sendMessage(msg.from, mensagem);
-    } else {
-        await client.sendMessage(msg.from, `❌ *Nenhum horário disponível para ${data_agendamento}.*`);
-        return;
-    }
-    
-    horario_agendamento = await solicitarCampo(horario_agendamento, '❌ Horário inválido! Envie no formato HH:mm.', /^([01]\d|2[0-3]):([0-5]\d)$/, 'Horário recebido');
-    if (!horario_agendamento) return;
+
+
     
     await client.sendMessage(
         msg.from,
         `📝 Confirme as informações:\n\n` +
         `Nome: ${cliente_nome}\n` +
-        `Serviço: ${servicosDisponiveis[servico_id].nome}\n` +
-        `Preço: R$ ${servicosDisponiveis[servico_id].preco}\n` +
-        `Data: ${data_agendamento}\n` +
-        `Horário: ${horario_agendamento}\n\n` +
         `Digite *Sim* ✅ para confirmar\nDigite *Cancelar* ❌ para cancelar e voltar ao menu principal\nDigite *Menu* para retornar ao menu principal.`
     );
 
@@ -541,10 +575,8 @@ const horariosDisponiveis = await verificarDisponibilidade(servico_id, data_agen
     try {
         const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
             cliente_nome,
-            cliente_telefone,
-            servico_id,
-            data_agendamento,
-            horario_agendamento: `${horario_agendamento}:00`
+            cliente_telefone
+           
         });
 
         protocolo = protocoloResponse.data.protocolo;
@@ -552,13 +584,10 @@ const horariosDisponiveis = await verificarDisponibilidade(servico_id, data_agen
         if (protocolo) {
             await client.sendMessage(
                 msg.from,
-                `✅ *Agendamento Confirmado!*\n` +
+                `✅ *Você está cadastrado e Confirmado!*\n` +
                 `📜 *Protocolo:* ${protocolo}\n` +
-                `👤 *Nome:* ${cliente_nome}\n` +
-                `💼 *Serviço:* ${servicosDisponiveis[servico_id].nome}\n` +
-                `💰 *Preço:* R$ ${servicosDisponiveis[servico_id].preco}\n` +
-                `📅 *Data:* ${data_agendamento}\n` +
-                `⏰ *Horário:* ${horario_agendamento}`
+                `👤 *Nome:* ${cliente_nome}\n` 
+                
             );
             
         } else {
@@ -569,10 +598,6 @@ const horariosDisponiveis = await verificarDisponibilidade(servico_id, data_agen
     }
 
 //final do menu 2
-
-
-
-
 
 
 
