@@ -147,49 +147,57 @@ client.on('message', async msg => {
         const name = contact.pushname || "Cliente";
 
        
-        let cliente_nome = name;
+        const clientesRespondidos = {}; // Cache para armazenar clientes que já responderam
 
-        let loja1= "Loja01";
-        let loja2="Loja02";
-        
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-      await client.sendMessage(
-    msg.from,
-    `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
-);
-
-client.on('message', async (resposta) => {
-    let respostaTexto = resposta.body.toLowerCase().trim();
-    let usuario_responsavel = "";
-    let endereco_loja1 = "Loja01";
-    let endereco_loja2 = "Loja02";
+async function perguntarRegiao(msg, name) {
     let cliente_telefone = msg.from.split('@')[0];
 
-    if (respostaTexto === "sim") {
-        usuario_responsavel = endereco_loja1;
-    } else if (respostaTexto === "não") {
-        usuario_responsavel = endereco_loja2;
-    } else {
-        await client.sendMessage(msg.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
-        return;
+    // Se o cliente já respondeu antes, pular essa etapa
+    if (clientesRespondidos[cliente_telefone]) {
+        return enviarMenu(msg, name);
     }
 
-    try {
-        const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-          cliente_nome,
-            cliente_telefone,
-            usuario_responsavel
-        });
+    await client.sendMessage(
+        msg.from,
+        `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
+    );
 
-        console.log("Cadastro disparado com sucesso para", usuario_responsavel);
-    } catch (error) {
-        await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
-    }
+    client.on('message', async (resposta) => {
+        let respostaTexto = resposta.body.toLowerCase().trim();
+        let usuario_responsavel = "";
+        let endereco_loja1 = "Loja01";
+        let endereco_loja2 = "Loja02";
 
-    // Após a resposta e a criação do protocolo, enviar o menu
+        if (respostaTexto === "sim") {
+            usuario_responsavel = endereco_loja1;
+        } else if (respostaTexto === "não") {
+            usuario_responsavel = endereco_loja2;
+        } else {
+            await client.sendMessage(msg.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
+            return;
+        }
+
+        try {
+            await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+                cliente_nome: name,
+                cliente_telefone,
+                usuario_responsavel
+            });
+
+            console.log("Cadastro disparado com sucesso para", usuario_responsavel);
+        } catch (error) {
+            await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
+        }
+
+        // Marcar cliente como já respondido
+        clientesRespondidos[cliente_telefone] = true;
+
+        // Após a resposta, enviar o menu
+        enviarMenu(msg, name);
+    });
+}
+
+async function enviarMenu(msg, name) {
     await client.sendMessage(
         msg.from,
         `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
@@ -200,7 +208,10 @@ client.on('message', async (resposta) => {
         `5️⃣ - Outras dúvidas\n` +
         `6️⃣ - Consultar Brindes`
     );
-});
+}
+
+// Chamar a função principal
+perguntarRegiao(msg, name);
 
     //final menu inicial
     }
