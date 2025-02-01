@@ -416,36 +416,7 @@ if (msg.body === '6' && msg.from.endsWith('@c.us')) {
         );
     }
 
-     // Verifica se o usuário quer editar algum dado
-     if (msg.body.startsWith('editar') && msg.from.endsWith('@c.us')) {
-        const editField = msg.body.split(' ')[1]; // Exemplo: 'editar nome'
     
-        if (editField === 'nome') {
-            // Resetando as variáveis
-            cliente_nome = '';
-            await client.sendMessage(msg.from, `📝 Por favor, envie novamente seu nome completo.`);
-            cliente_nome = msg.body;
-        } else if (editField === 'serviço') {
-            // Resetando as variáveis
-            servico_id = '';
-         
-            await client.sendMessage(msg.from, `📝 Por favor, envie o serviço desejado novamente.`);
-            servico_id = msg.body;
-        } else if (editField === 'data') {
-            // Resetando as variáveis
-            data_agendamento = '';
-            await client.sendMessage(msg.from, `📝 Por favor, envie a data desejada novamente no formato DD/MM/AAAA.`);
-            data_agendamento = msg.body;
-            
-        } else if (editField === 'horário') {
-            // Resetando as variáveis
-            horario_agendamento = '';
-            await client.sendMessage(msg.from, `📝 Por favor, envie o horário desejado novamente no formato HH:mm.`);
-            horario_agendamento = msg.body;
-        } else {
-            await client.sendMessage(msg.from, `❌ Não entendi. Para editar algum dado, envie: 'editar nome', 'editar serviço', 'editar data' ou 'editar horário'.`);
-        }
-    }
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -558,7 +529,7 @@ if (msg.body === '2' && msg.from.endsWith('@c.us')) {
 
 //final do menu 2
 
-}
+})
 
 const agendamentosNotificados = new Set();
 
