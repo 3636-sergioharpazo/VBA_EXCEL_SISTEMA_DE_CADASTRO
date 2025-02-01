@@ -656,4 +656,4 @@ async function enviarLembretes() {
     } catch (error) {
         console.error('❌ Erro ao buscar agendamentos:', error.message || error);
     }
-}
+
