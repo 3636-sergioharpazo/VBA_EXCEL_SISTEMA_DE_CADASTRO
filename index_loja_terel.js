@@ -200,8 +200,8 @@ client.on('message', async msg => {
         await client.sendMessage(
             msg.from,
             `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
-            `📝\n${listaServicos}\n` +
-            `Digite *2* para agendar seu horário! `
+            `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
+            `🔹 Digite *2* para agendar seu horário!`
         );
     }
 
