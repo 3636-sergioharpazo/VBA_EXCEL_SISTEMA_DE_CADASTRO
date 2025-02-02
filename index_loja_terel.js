@@ -200,7 +200,9 @@ async function enviarMenu(msg, name) {
 // Função para processar a mensagem e chamar os menus apropriados
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
-    const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
+  
+  const palavrasChave = /^\s*(1|menu|2|dia|3|tarde|4|noite|5|oi|6|voltar|7|olá|8|ola)\s*$/i;
+
 
     // Se a mensagem não contiver uma palavra-chave, ignore
     if (!palavrasChave.test(msg.body) || !msg.from.endsWith('@c.us')) {
@@ -210,7 +212,7 @@ client.on('message', async msg => {
     const chat = await msg.getChat();
     const contact = await msg.getContact();
     const name = contact.pushname || "Cliente";
-
+perguntarRegiao(msg, name)
     // Chama a função para enviar o menu inicial
     if (msg.body.trim().toLowerCase() === 'oi' || msg.body.trim().toLowerCase() === 'olá') {
         await enviarMenu(msg, name);
