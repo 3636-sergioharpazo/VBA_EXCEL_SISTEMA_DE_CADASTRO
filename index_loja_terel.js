@@ -230,7 +230,7 @@ client.on('message', async msg => {
     }
 
     perguntarRegiao(msg, name);
-});
+
     // Resposta para a opção "Serviços e Preços"
     if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
         await delay(2000);
