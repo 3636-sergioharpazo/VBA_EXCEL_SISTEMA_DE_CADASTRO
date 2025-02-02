@@ -167,6 +167,7 @@ async function perguntarRegiao(msg, name) {
         let usuario_responsavel = "";
         let endereco_loja1 = "Loja01";
         let endereco_loja2 = "Loja02";
+        cliente_nome=name;
 
         if (respostaTexto === "sim") {
             usuario_responsavel = endereco_loja1;
@@ -179,12 +180,12 @@ async function perguntarRegiao(msg, name) {
 
         try {
             await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                cliente_nome: name,
+                cliente_nome,
                 cliente_telefone,
                 usuario_responsavel
             });
 
-            console.log("Cadastro disparado com sucesso para", usuario_responsavel);
+            console.log("Cadastro disparado com sucesso para", usuario_responsavel,cliente_nome,cliente_telefone);
         } catch (error) {
             await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
         }
