@@ -140,15 +140,19 @@ const clientesRespondidos = {}; // Cache para armazenar clientes que já respond
 
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
+    const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
 
-    if (/^(menu|Menu|dia|tarde|noite|oi|Oi|Voltar|voltar|Olá|olá|ola|Ola)$/i.test(msg.body) && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
-        const contact = await msg.getContact();
-        const name = contact.pushname || "Cliente";
-
-        perguntarRegiao(msg, name);
+    // Se a mensagem não contiver uma palavra-chave, ignore
+    if (!palavrasChave.test(msg.body) || !msg.from.endsWith('@c.us')) {
+        return;
     }
 
+    const chat = await msg.getChat();
+    const contact = await msg.getContact();
+    const name = contact.pushname || "Cliente";
+
+    perguntarRegiao(msg, name);
+});
 
 async function perguntarRegiao(msg, name) {
     let cliente_telefone = msg.from.split('@')[0];
@@ -206,10 +210,10 @@ async function enviarMenu(msg, name) {
         `3️⃣ - Promoções da semana\n` +
         `4️⃣ - Localização\n` +
         `5️⃣ - Outras dúvidas\n` 
-       
     );
 }
-  // Resposta para a opção "Serviços e Preços"
+
+// Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
        
         await delay(2000);
