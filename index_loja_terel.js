@@ -199,17 +199,19 @@ async function enviarMenu(msg, name) {
   
 }
 
-
-
 client.on('message', async msg => {
     if (!msg.from.endsWith('@c.us')) return;
 
     const contact = await msg.getContact();
     const name = contact.pushname || "Cliente";
-     const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
+    const chat = await msg.getChat();
+    await delay(2000);
+    await chat.sendStateTyping();
+    await delay(2000);
+
+    // Sempre pergunta sobre a região do Grajaú primeiro
+    await perguntarRegiao(msg, name);
+
     if (/^(menu|bom dia|boa noite|oi|olá|ola)$/i.test(msg.body.trim())) {
         await enviarMenu(msg, name);
         return;
@@ -219,8 +221,6 @@ client.on('message', async msg => {
         await msg.body.trim()
         return;
     }
-
-    perguntarRegiao(msg, name);
 
     // Resposta para a opção "Serviços e Preços"
     if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
