@@ -198,20 +198,7 @@ async function enviarMenu(msg, name) {
     );
 }
 
-async function processarEscolha(msg) {
-    const opcoes = {
-        "1": "🔹 *Serviços e Preços* \nOferecemos diversos serviços com preços acessíveis. Entre em contato para mais detalhes!",
-        "2": "🎁 *Ganhe Brindes* \nParticipe de nossas promoções e ganhe brindes exclusivos!",
-        "3": "🔥 *Promoções da Semana* \nConfira nossas ofertas especiais válidas até domingo!",
-        "4": "📍 *Localização* \nEstamos localizados na Rua Exemplo, 123, Centro. Venha nos visitar!",
-        "5": "❓ *Outras Dúvidas* \nSe precisar de mais informações, fale com um de nossos atendentes."
-    };
 
-    let escolha = msg.body.trim();
-    if (opcoes[escolha]) {
-        await client.sendMessage(msg.from, opcoes[escolha]);
-    }
-}
 
 client.on('message', async msg => {
     if (!msg.from.endsWith('@c.us')) return;
