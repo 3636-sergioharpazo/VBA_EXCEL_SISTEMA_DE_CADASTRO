@@ -136,23 +136,23 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 // Variáveis para armazenar os dados do cliente e do agendamento
 let cliente_nome = '';
 
-// Manipulação de mensagens
+const clientesRespondidos = {}; // Cache para armazenar clientes que já responderam
+
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
 
-    // Resposta ao menu inicial
     if (/^(menu|Menu|dia|tarde|noite|oi|Oi|Voltar|voltar|Olá|olá|ola|Ola)$/i.test(msg.body) && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
         const contact = await msg.getContact();
         const name = contact.pushname || "Cliente";
 
-       
-        const clientesRespondidos = {}; // Cache para armazenar clientes que já responderam
+        perguntarRegiao(msg, name);
+    }
+});
 
 async function perguntarRegiao(msg, name) {
     let cliente_telefone = msg.from.split('@')[0];
 
-    // Se o cliente já respondeu antes, pular essa etapa
     if (clientesRespondidos[cliente_telefone]) {
         return enviarMenu(msg, name);
     }
@@ -162,40 +162,39 @@ async function perguntarRegiao(msg, name) {
         `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
     );
 
-    client.on('message', async (resposta) => {
-    let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
-    let usuario_responsavel = "";
-    let endereco_loja1 = "Loja01";
-    let endereco_loja2 = "Loja02";
+    client.once('message', async (resposta) => {
+        if (resposta.from !== msg.from) return; // Garante que a resposta é do mesmo usuário
 
-    if (respostaTexto.match(/^sim$/i)) {
-        usuario_responsavel = endereco_loja1;
-    } else if (respostaTexto.match(/^nao$/i)) {
-        usuario_responsavel = endereco_loja2;
-    } else {
-        await client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
-        return;
-    }
-});
+        let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let usuario_responsavel = "";
+        let endereco_loja1 = "Loja01";
+        let endereco_loja2 = "Loja02";
+
+        if (respostaTexto === "sim") {
+            usuario_responsavel = endereco_loja1;
+        } else if (respostaTexto === "nao") {
+            usuario_responsavel = endereco_loja2;
+        } else {
+            await client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
+            return;
+        }
 
         try {
             await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                cliente_nome,
+                cliente_nome: name,
                 cliente_telefone,
                 usuario_responsavel
             });
 
-            console.log("Cadastro disparado com sucesso para", usuario_responsavel,cliente_nome,cliente_telefone);
+            console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
         } catch (error) {
-            await client.sendMessage(msg.from, '❌ Erro Tente novamente.');
+            await client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
+            return;
         }
 
-        // Marcar cliente como já respondido
         clientesRespondidos[cliente_telefone] = true;
-
-        // Após a resposta, enviar o menu
         enviarMenu(msg, name);
-    
+    });
 }
 
 async function enviarMenu(msg, name) {
@@ -210,16 +209,7 @@ async function enviarMenu(msg, name) {
         `6️⃣ - Consultar Brindes`
     );
 }
-
-// Chamar a função principal
-perguntarRegiao(msg, name);
-
-    //final menu inicial
-    }
-      
-    
-
-    // Resposta para a opção "Serviços e Preços"
+  // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
         await delay(2000);
