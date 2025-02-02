@@ -163,20 +163,20 @@ async function perguntarRegiao(msg, name) {
     );
 
     client.on('message', async (resposta) => {
-        let respostaTexto = resposta.body.toLowerCase().trim();
-        let usuario_responsavel = "";
-        let endereco_loja1 = "Loja01";
-        let endereco_loja2 = "Loja02";
-        cliente_nome=name;
+    let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+    let usuario_responsavel = "";
+    let endereco_loja1 = "Loja01";
+    let endereco_loja2 = "Loja02";
 
-        if (respostaTexto === "sim") {
-            usuario_responsavel = endereco_loja1;
-        } else if (respostaTexto === "não") {
-            usuario_responsavel = endereco_loja2;
-        } else {
-            await client.sendMessage(msg.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
-            return;
-        }
+    if (respostaTexto.match(/^sim$/i)) {
+        usuario_responsavel = endereco_loja1;
+    } else if (respostaTexto.match(/^nao$/i)) {
+        usuario_responsavel = endereco_loja2;
+    } else {
+        await client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
+        return;
+    }
+});
 
         try {
             await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
