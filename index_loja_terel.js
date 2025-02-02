@@ -261,6 +261,7 @@ async function enviarMenu(msg, name) {
     // Resposta para "Promoções da Semana"
     if (msg.body === '3' && msg.from.endsWith('@c.us')) {
        
+      await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
 
@@ -303,9 +304,9 @@ async function enviarMenu(msg, name) {
     // Menu 2
     if (msg.body === '2' && msg.from.endsWith('@c.us')) {
         (async () => {
-           
-          await chat.sendStateTyping();
-            await delay(2000);
+         await delay(2000);
+        await chat.sendStateTyping();
+        await delay(2000);
 
             let cliente_nome = '';
             let cliente_telefone = msg.from.split('@')[0];
