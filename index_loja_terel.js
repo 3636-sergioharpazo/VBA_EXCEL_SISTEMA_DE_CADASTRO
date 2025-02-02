@@ -205,13 +205,13 @@ async function enviarMenu(msg, name) {
         `2️⃣ - Ganhar brindes\n` +
         `3️⃣ - Promoções da semana\n` +
         `4️⃣ - Localização\n` +
-        `5️⃣ - Outras dúvidas\n` +
-        `6️⃣ - Consultar Brindes`
+        `5️⃣ - Outras dúvidas\n` 
+       
     );
 }
   // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
+       
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
@@ -240,7 +240,6 @@ async function enviarMenu(msg, name) {
 
     // Resposta para "Localização"
     if (msg.body === '4' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
@@ -261,8 +260,7 @@ async function enviarMenu(msg, name) {
     
     // Resposta para "Promoções da Semana"
     if (msg.body === '3' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
-        await delay(2000);
+       await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
 
@@ -291,7 +289,6 @@ async function enviarMenu(msg, name) {
 
     // Resposta para "Outras Dúvidas"
     if (msg.body === '5' && msg.from.endsWith('@c.us')) {
-        const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
@@ -306,8 +303,8 @@ async function enviarMenu(msg, name) {
     // Menu 2
     if (msg.body === '2' && msg.from.endsWith('@c.us')) {
         (async () => {
-            const chat = await msg.getChat();
-            await chat.sendStateTyping();
+           
+          await chat.sendStateTyping();
             await delay(2000);
 
             let cliente_nome = '';
