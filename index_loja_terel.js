@@ -141,7 +141,7 @@ async function perguntarRegiao(msg, name) {
     let cliente_telefone = msg.from.split('@')[0];
 
     if (clientesRespondidos[cliente_telefone]) {
-        return enviarMenu(msg, name);
+        return;
     }
 
     await client.sendMessage(
@@ -149,37 +149,32 @@ async function perguntarRegiao(msg, name) {
         `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
     );
 
-    const capturarResposta = (resposta) => {
-        if (resposta.from !== msg.from) return; 
+    const capturarResposta = async (resposta) => {
+        if (resposta.from !== msg.from) return;
 
-        let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        let usuario_responsavel = "";
-        let endereco_loja1 = "Loja01";
-        let endereco_loja2 = "Loja02";
+        let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+        let usuario_responsavel = respostaTexto === "sim" ? "Loja01" : respostaTexto === "nao" ? "Loja02" : null;
 
-        if (respostaTexto === "sim") {
-            usuario_responsavel = endereco_loja1;
-        } else if (respostaTexto === "nao") {
-            usuario_responsavel = endereco_loja2;
-        } else {
+        if (!usuario_responsavel) {
             client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
             return;
         }
 
         client.off('message', capturarResposta);
 
-        axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-            cliente_nome: name,
-            cliente_telefone,
-            usuario_responsavel
-        }).then(() => {
+        try {
+            await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+                cliente_nome: name,
+                cliente_telefone,
+                usuario_responsavel
+            });
             console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
             clientesRespondidos[cliente_telefone] = true;
-            enviarMenu(msg, name);
-        }).catch(error => {
+            await enviarMenu(msg, name);
+        } catch (error) {
             client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
             console.error("Erro ao enviar dados para API:", error);
-        });
+        }
     };
 
     client.on('message', capturarResposta);
@@ -188,36 +183,54 @@ async function perguntarRegiao(msg, name) {
 async function enviarMenu(msg, name) {
     await client.sendMessage(
         msg.from,
-        `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
-        `1️⃣ - Serviços e preços\n` +
-        `2️⃣ - Ganhar brindes\n` +
-        `3️⃣ - Promoções da semana\n` +
-        `4️⃣ - Localização\n` +
-        `5️⃣ - Outras dúvidas\n`
+        `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:
+
+` +
+        `1️⃣ - Serviços e preços
+` +
+        `2️⃣ - Ganhar brindes
+` +
+        `3️⃣ - Promoções da semana
+` +
+        `4️⃣ - Localização
+` +
+        `5️⃣ - Outras dúvidas`
     );
 }
 
-// Função para processar a mensagem e chamar os menus apropriados
+async function processarEscolha(msg) {
+    const opcoes = {
+        "1": "🔹 *Serviços e Preços* \nOferecemos diversos serviços com preços acessíveis. Entre em contato para mais detalhes!",
+        "2": "🎁 *Ganhe Brindes* \nParticipe de nossas promoções e ganhe brindes exclusivos!",
+        "3": "🔥 *Promoções da Semana* \nConfira nossas ofertas especiais válidas até domingo!",
+        "4": "📍 *Localização* \nEstamos localizados na Rua Exemplo, 123, Centro. Venha nos visitar!",
+        "5": "❓ *Outras Dúvidas* \nSe precisar de mais informações, fale com um de nossos atendentes."
+    };
+
+    let escolha = msg.body.trim();
+    if (opcoes[escolha]) {
+        await client.sendMessage(msg.from, opcoes[escolha]);
+    }
+}
+
 client.on('message', async msg => {
-    const cliente_telefone = msg.from.split('@')[0];
-  
-  const palavrasChave = /^\s*(1|menu|2|dia|3|tarde|4|noite|5|oi|6|voltar|7|olá|8|ola)\s*$/i;
+    if (!msg.from.endsWith('@c.us')) return;
 
+    const contact = await msg.getContact();
+    const name = contact.pushname || "Cliente";
 
-    // Se a mensagem não contiver uma palavra-chave, ignore
-    if (!palavrasChave.test(msg.body) || !msg.from.endsWith('@c.us')) {
+    if (/^(menu|bom dia|boa noite|oi|olá|ola)$/i.test(msg.body.trim())) {
+        await enviarMenu(msg, name);
         return;
     }
 
-    const chat = await msg.getChat();
-    const contact = await msg.getContact();
-    const name = contact.pushname || "Cliente";
-perguntarRegiao(msg, name)
-    // Chama a função para enviar o menu inicial
-    if (msg.body.trim().toLowerCase() === 'oi' || msg.body.trim().toLowerCase() === 'olá') {
-        await enviarMenu(msg, name);
+    if (/^[1-5]$/.test(msg.body.trim())) {
+        await processarEscolha(msg);
+        return;
     }
 
+    perguntarRegiao(msg, name);
+});
     // Resposta para a opção "Serviços e Preços"
     if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
         await delay(2000);
