@@ -195,7 +195,7 @@ async function perguntarRegiao(msg, name) {
 
         // Após a resposta, enviar o menu
         enviarMenu(msg, name);
-    });
+    
 }
 
 async function enviarMenu(msg, name) {
