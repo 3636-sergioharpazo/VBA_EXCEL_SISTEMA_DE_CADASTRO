@@ -254,13 +254,13 @@ async function enviarMenu(msg, name) {
     }
 
     // Função delay
-    function delay(ms) {
+      async function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     
     // Resposta para "Promoções da Semana"
     if (msg.body === '3' && msg.from.endsWith('@c.us')) {
-       await delay(2000);
+       
         await chat.sendStateTyping();
         await delay(2000);
 
