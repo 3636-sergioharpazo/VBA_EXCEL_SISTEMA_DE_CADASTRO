@@ -212,7 +212,7 @@ client.on('message', async msg => {
     }
 
     if (/^[1-5]$/.test(msg.body.trim())) {
-        await processarEscolha(msg);
+        await msg.body.trim()
         return;
     }
 
