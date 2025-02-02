@@ -196,6 +196,7 @@ async function enviarMenu(msg, name) {
 ` +
         `5️⃣ - Outras dúvidas`
     );
+  
 }
 
 
@@ -205,7 +206,10 @@ client.on('message', async msg => {
 
     const contact = await msg.getContact();
     const name = contact.pushname || "Cliente";
-
+     const chat = await msg.getChat();
+        await delay(2000);
+        await chat.sendStateTyping();
+        await delay(2000);
     if (/^(menu|bom dia|boa noite|oi|olá|ola)$/i.test(msg.body.trim())) {
         await enviarMenu(msg, name);
         return;
