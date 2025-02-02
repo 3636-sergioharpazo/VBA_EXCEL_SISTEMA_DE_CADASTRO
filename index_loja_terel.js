@@ -148,7 +148,7 @@ client.on('message', async msg => {
 
         perguntarRegiao(msg, name);
     }
-});
+
 
 async function perguntarRegiao(msg, name) {
     let cliente_telefone = msg.from.split('@')[0];
