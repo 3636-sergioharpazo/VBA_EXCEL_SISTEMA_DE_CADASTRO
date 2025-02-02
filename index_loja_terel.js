@@ -187,7 +187,7 @@ async function perguntarRegiao(msg, name) {
 
             console.log("Cadastro disparado com sucesso para", usuario_responsavel,cliente_nome,cliente_telefone);
         } catch (error) {
-            await client.sendMessage(msg.from, '❌ Erro ao confirmar o agendamento. Tente novamente.');
+            await client.sendMessage(msg.from, '❌ Erro Tente novamente.');
         }
 
         // Marcar cliente como já respondido
