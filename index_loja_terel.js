@@ -185,27 +185,24 @@ async function perguntarRegiao(msg, name) {
   });
 }
 
+// Função para enviar o menu inicial
 async function enviarMenu(msg, name) {
-  await client.sendMessage(
-      msg.from,
-      `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
-      `1️⃣ - Serviços e preços\n` +
-      `2️⃣ - Ganhar brindes\n` +
-      `3️⃣ - Promoções da semana\n` +
-      `4️⃣ - Localização\n` +
-      `5️⃣ - Outras dúvidas\n` 
-  );
+    await client.sendMessage(
+        msg.from,
+        `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
+        `1️⃣ - Serviços e preços\n` +
+        `2️⃣ - Ganhar brindes\n` +
+        `3️⃣ - Promoções da semana\n` +
+        `4️⃣ - Localização\n` +
+        `5️⃣ - Outras dúvidas\n`
+    );
 }
 
-
-
+// Função para processar a mensagem e chamar os menus apropriados
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
+    const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
 
-const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
-
-
-    
     // Se a mensagem não contiver uma palavra-chave, ignore
     if (!palavrasChave.test(msg.body) || !msg.from.endsWith('@c.us')) {
         return;
@@ -215,15 +212,14 @@ const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
     const contact = await msg.getContact();
     const name = contact.pushname || "Cliente";
 
-    perguntarRegiao(msg, name);
+    // Chama a função para enviar o menu inicial
+    if (msg.body.trim().toLowerCase() === 'oi' || msg.body.trim().toLowerCase() === 'olá') {
+        await enviarMenu(msg, name);
+    }
 
-
-// Resposta para a opção "Serviços e Preços"
-
-  if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
-
-      
-       await delay(2000);
+    // Resposta para a opção "Serviços e Preços"
+    if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
+        await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
 
@@ -236,11 +232,11 @@ const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
             await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
             return;
         }
-       
+
         const listaServicos = Object.entries(servicosDisponiveis)
             .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
             .join('\n');
-       
+
         await client.sendMessage(
             msg.from,
             `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
@@ -250,9 +246,7 @@ const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
     }
 
     // Resposta para "Localização"
-  if (msg.body.trim() === '4' && msg.from.endsWith('@c.us')) { 
-
-          const chat = await msg.getChat();
+    if (msg.body.trim() === '4' && msg.from.endsWith('@c.us')) {
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
@@ -266,17 +260,9 @@ const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
         );
     }
 
-    // Função delay
-      async function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
     // Resposta para "Promoções da Semana"
-  if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) { 
-
-
-        const chat = await msg.getChat();
-      await delay(2000);
+    if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) {
+        await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
 
@@ -304,8 +290,7 @@ const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
     }
 
     // Resposta para "Outras Dúvidas"
-          if (msg.body.trim() === '5' && msg.from.endsWith('@c.us')) { 
-       const chat = await msg.getChat();
+    if (msg.body.trim() === '5' && msg.from.endsWith('@c.us')) {
         await delay(2000);
         await chat.sendStateTyping();
         await delay(2000);
@@ -317,13 +302,13 @@ const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
         );
     }
 
-    // Menu 2
-if (msg.body.trim() === '2' && msg.from.endsWith('@c.us')) { 
+    // Menu 2: Ganhar Brindes
+    if (msg.body.trim() === '2' && msg.from.endsWith('@c.us')) {
         (async () => {
-           const chat = await msg.getChat();
-         await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
+            const chat = await msg.getChat();
+            await delay(2000);
+            await chat.sendStateTyping();
+            await delay(2000);
 
             let cliente_nome = '';
             let cliente_telefone = msg.from.split('@')[0];
@@ -401,13 +386,13 @@ if (msg.body.trim() === '2' && msg.from.endsWith('@c.us')) {
                 await client.sendMessage(msg.from, '❌ Agendamento cancelado. Retornando ao menu principal.');
                 return;
             }
-let usurio_responsavel="Brindes";
+
+            let usurio_responsavel = "Brindes";
             try {
                 const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
                     cliente_nome,
                     cliente_telefone,
-                  usurio_responsavel
-                  
+                    usurio_responsavel
                 });
 
                 protocolo = protocoloResponse.data.protocolo;
@@ -429,6 +414,10 @@ let usurio_responsavel="Brindes";
     }
 });
 
+// Função delay
+async function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 
 const agendamentosNotificados = new Set();
