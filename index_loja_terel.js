@@ -401,11 +401,13 @@ if (msg.body.trim() === '2' && msg.from.endsWith('@c.us')) {
                 await client.sendMessage(msg.from, '❌ Agendamento cancelado. Retornando ao menu principal.');
                 return;
             }
-
+let usurio_responsavel="Brindes";
             try {
                 const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
                     cliente_nome,
-                    cliente_telefone
+                    cliente_telefone,
+                  usurio_responsavel
+                  
                 });
 
                 protocolo = protocoloResponse.data.protocolo;
