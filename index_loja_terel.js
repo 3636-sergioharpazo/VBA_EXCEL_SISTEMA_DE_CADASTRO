@@ -271,7 +271,7 @@ client.on('message', async msg => {
     }
     
     // Resposta para "Promoções da Semana"
-  if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) { ... }
+  if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) { 
 
 
         const chat = await msg.getChat();
