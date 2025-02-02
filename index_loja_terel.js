@@ -202,7 +202,8 @@ async function enviarMenu(msg, name) {
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
 
-  const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola|\d+)$/i;
+const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
+
 
     
     // Se a mensagem não contiver uma palavra-chave, ignore
