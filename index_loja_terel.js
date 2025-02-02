@@ -135,57 +135,56 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
 // Variáveis para armazenar os dados do cliente e do agendamento
 let cliente_nome = '';
-
 const clientesRespondidos = {}; // Cache para armazenar clientes que já responderam
 
 async function perguntarRegiao(msg, name) {
-  let cliente_telefone = msg.from.split('@')[0];
+    let cliente_telefone = msg.from.split('@')[0];
 
-  if (clientesRespondidos[cliente_telefone]) {
-      return enviarMenu(msg, name);
-  }
+    if (clientesRespondidos[cliente_telefone]) {
+        return enviarMenu(msg, name);
+    }
 
-  await client.sendMessage(
-      msg.from,
-      `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
-  );
+    await client.sendMessage(
+        msg.from,
+        `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
+    );
 
-  client.once('message', async (resposta) => {
-      if (resposta.from !== msg.from) return; // Garante que a resposta é do mesmo usuário
+    const capturarResposta = (resposta) => {
+        if (resposta.from !== msg.from) return; 
 
-      let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      let usuario_responsavel = "";
-      let endereco_loja1 = "Loja01";
-      let endereco_loja2 = "Loja02";
+        let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let usuario_responsavel = "";
+        let endereco_loja1 = "Loja01";
+        let endereco_loja2 = "Loja02";
 
-      if (respostaTexto === "sim") {
-          usuario_responsavel = endereco_loja1;
-      } else if (respostaTexto === "nao") {
-          usuario_responsavel = endereco_loja2;
-      } else {
-          await client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
-          return;
-      }
+        if (respostaTexto === "sim") {
+            usuario_responsavel = endereco_loja1;
+        } else if (respostaTexto === "nao") {
+            usuario_responsavel = endereco_loja2;
+        } else {
+            client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
+            return;
+        }
 
-      try {
-          await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-              cliente_nome: name,
-              cliente_telefone,
-              usuario_responsavel
-          });
+        client.off('message', capturarResposta);
 
-          console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
-      } catch (error) {
-          await client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
-          return;
-      }
+        axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+            cliente_nome: name,
+            cliente_telefone,
+            usuario_responsavel
+        }).then(() => {
+            console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
+            clientesRespondidos[cliente_telefone] = true;
+            enviarMenu(msg, name);
+        }).catch(error => {
+            client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
+            console.error("Erro ao enviar dados para API:", error);
+        });
+    };
 
-      clientesRespondidos[cliente_telefone] = true;
-      enviarMenu(msg, name);
-  });
+    client.on('message', capturarResposta);
 }
 
-// Função para enviar o menu inicial
 async function enviarMenu(msg, name) {
     await client.sendMessage(
         msg.from,
