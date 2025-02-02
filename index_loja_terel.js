@@ -138,6 +138,67 @@ let cliente_nome = '';
 
 const clientesRespondidos = {}; // Cache para armazenar clientes que já responderam
 
+async function perguntarRegiao(msg, name) {
+  let cliente_telefone = msg.from.split('@')[0];
+
+  if (clientesRespondidos[cliente_telefone]) {
+      return enviarMenu(msg, name);
+  }
+
+  await client.sendMessage(
+      msg.from,
+      `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
+  );
+
+  client.once('message', async (resposta) => {
+      if (resposta.from !== msg.from) return; // Garante que a resposta é do mesmo usuário
+
+      let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      let usuario_responsavel = "";
+      let endereco_loja1 = "Loja01";
+      let endereco_loja2 = "Loja02";
+
+      if (respostaTexto === "sim") {
+          usuario_responsavel = endereco_loja1;
+      } else if (respostaTexto === "nao") {
+          usuario_responsavel = endereco_loja2;
+      } else {
+          await client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
+          return;
+      }
+
+      try {
+          await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+              cliente_nome: name,
+              cliente_telefone,
+              usuario_responsavel
+          });
+
+          console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
+      } catch (error) {
+          await client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
+          return;
+      }
+
+      clientesRespondidos[cliente_telefone] = true;
+      enviarMenu(msg, name);
+  });
+}
+
+async function enviarMenu(msg, name) {
+  await client.sendMessage(
+      msg.from,
+      `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
+      `1️⃣ - Serviços e preços\n` +
+      `2️⃣ - Ganhar brindes\n` +
+      `3️⃣ - Promoções da semana\n` +
+      `4️⃣ - Localização\n` +
+      `5️⃣ - Outras dúvidas\n` 
+  );
+}
+
+
+
 client.on('message', async msg => {
     const cliente_telefone = msg.from.split('@')[0];
     const palavrasChave = /^(menu|dia|tarde|noite|oi|voltar|olá|ola)$/i;
@@ -152,66 +213,7 @@ client.on('message', async msg => {
     const name = contact.pushname || "Cliente";
 
     perguntarRegiao(msg, name);
-});
 
-async function perguntarRegiao(msg, name) {
-    let cliente_telefone = msg.from.split('@')[0];
-
-    if (clientesRespondidos[cliente_telefone]) {
-        return enviarMenu(msg, name);
-    }
-
-    await client.sendMessage(
-        msg.from,
-        `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
-    );
-
-    client.once('message', async (resposta) => {
-        if (resposta.from !== msg.from) return; // Garante que a resposta é do mesmo usuário
-
-        let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        let usuario_responsavel = "";
-        let endereco_loja1 = "Loja01";
-        let endereco_loja2 = "Loja02";
-
-        if (respostaTexto === "sim") {
-            usuario_responsavel = endereco_loja1;
-        } else if (respostaTexto === "nao") {
-            usuario_responsavel = endereco_loja2;
-        } else {
-            await client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
-            return;
-        }
-
-        try {
-            await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                cliente_nome: name,
-                cliente_telefone,
-                usuario_responsavel
-            });
-
-            console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
-        } catch (error) {
-            await client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
-            return;
-        }
-
-        clientesRespondidos[cliente_telefone] = true;
-        enviarMenu(msg, name);
-    });
-}
-
-async function enviarMenu(msg, name) {
-    await client.sendMessage(
-        msg.from,
-        `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
-        `1️⃣ - Serviços e preços\n` +
-        `2️⃣ - Ganhar brindes\n` +
-        `3️⃣ - Promoções da semana\n` +
-        `4️⃣ - Localização\n` +
-        `5️⃣ - Outras dúvidas\n` 
-    );
-}
 
 // Resposta para a opção "Serviços e Preços"
     if (msg.body === '1' && msg.from.endsWith('@c.us')) {
@@ -472,4 +474,5 @@ async function enviarLembretes() {
     } catch (error) {
         console.error('❌ Erro ao buscar agendamentos:', error.message || error);
     }
+
 }
