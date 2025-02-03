@@ -137,28 +137,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 let cliente_nome = '';
 const clientesRespondidos = {}; // Cache para armazenar clientes que já responderam
 
-async function perguntarRegiao(msg, name) {
-    let cliente_telefone = msg.from.split('@')[0];
 
-    if (clientesRespondidos[cliente_telefone]) {
-        return;
-    }
-
-    await client.sendMessage(
-        msg.from,
-        `Olá *${name.split(" ")[0]}* ! 👋 Você é da região do Grajaú? (Responda 'sim' ou 'não')`
-    );
-
-    const capturarResposta = async (resposta) => {
-        if (resposta.from !== msg.from) return;
-
-        let respostaTexto = resposta.body.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-        let usuario_responsavel = respostaTexto === "sim" ? "Loja01" : respostaTexto === "nao" ? "Loja02" : null;
-
-        if (!usuario_responsavel) {
-            client.sendMessage(resposta.from, "❌ Resposta inválida. Responda apenas com 'sim' ou 'não'.");
-            return;
-        }
 
         client.off('message', capturarResposta);
 
@@ -210,7 +189,7 @@ client.on('message', async msg => {
     await delay(2000);
 
     // Sempre pergunta sobre a região do Grajaú primeiro
-    await perguntarRegiao(msg, name);
+   // await perguntarRegiao(msg, name);
 
     if (/^(menu|bom dia|boa noite|oi|olá|ola)$/i.test(msg.body.trim())) {
         await enviarMenu(msg, name);
