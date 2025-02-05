@@ -191,7 +191,7 @@ try {
             client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
             console.error("Erro ao enviar dados para API:", error);
         }
-    };
+    
     // Sempre pergunta sobre a região do Grajaú primeiro
    // await perguntarRegiao(msg, name);
 
