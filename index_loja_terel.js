@@ -144,7 +144,7 @@ const clientesRespondidos = {}; // Cache para armazenar clientes que já respond
         
 
     
-}
+
 
 async function enviarMenu(msg, name) {
     await client.sendMessage(
