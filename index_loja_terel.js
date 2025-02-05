@@ -139,24 +139,11 @@ const clientesRespondidos = {}; // Cache para armazenar clientes que já respond
 
 
 
-        client.off('message', capturarResposta);
+        
 
-        try {
-            await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                cliente_nome: name,
-                cliente_telefone,
-                usuario_responsavel
-            });
-            console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
-            clientesRespondidos[cliente_telefone] = true;
-            await enviarMenu(msg, name);
-        } catch (error) {
-            client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
-            console.error("Erro ao enviar dados para API:", error);
-        }
-    };
+        
 
-    client.on('message', capturarResposta);
+    
 }
 
 async function enviarMenu(msg, name) {
@@ -188,6 +175,23 @@ client.on('message', async msg => {
     await chat.sendStateTyping();
     await delay(2000);
 
+  let usuario_responsavel="Loja01";
+  let cliente_telefone = msg.from.split('@')[0];
+  
+try {
+            await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+                cliente_nome: name,
+                cliente_telefone,
+                usuario_responsavel
+            });
+            console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
+            
+            await enviarMenu(msg, name);
+        } catch (error) {
+            client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
+            console.error("Erro ao enviar dados para API:", error);
+        }
+    };
     // Sempre pergunta sobre a região do Grajaú primeiro
    // await perguntarRegiao(msg, name);
 
