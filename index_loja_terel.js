@@ -146,34 +146,31 @@ const clientesRespondidos = {}; // Cache para armazenar clientes que já respond
     
 
 
-async function enviarMenu(msg, name) {
-    await client.sendMessage(
-        msg.from,
-        `Olá *${name.split(" ")[0]}*! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:
-
-` +
-        `1️⃣ - Serviços e preços
-` +
-        `2️⃣ - Ganhar brindes
-` +
-        `3️⃣ - Promoções da semana
-` +
-        `4️⃣ - Localização
-` +
-        `5️⃣ - Outras dúvidas`
-    );
-  
-}
-
 client.on('message', async msg => {
     if (!msg.from.endsWith('@c.us')) return;
 
-    const contact = await msg.getContact();
+ if (/^(menu|Menu|dia|tarde|noite|oi|Oi|Voltar|voltar|Olá|olá|ola|Ola)$/i.test(msg.body) && msg.from.endsWith('@c.us')) {
+        
+   const chat = await msg.getChat();
+        const contact = await msg.getContact();
     const name = contact.pushname || "Cliente";
-    const chat = await msg.getChat();
-    await delay(2000);
-    await chat.sendStateTyping();
-    await delay(2000);
+       await delay(2000);
+        await chat.sendStateTyping();
+        await delay(2000);
+
+        await client.sendMessage(
+            msg.from,
+            `Olá, ${name.split(" ")[0]}! 👋 Eu sou o assistente virtual do *Lojas Terel*. Como posso ajudá-lo(a) hoje? Escolha uma das opções abaixo:\n\n` +
+            `1️⃣ - Serviços e preços\n` +
+            `2️⃣ - Brindes \n` +
+            `3️⃣ - Promoções da semana\n` +
+            `4️⃣ - Localização\n` +
+            `5️⃣ - Outras dúvidas\n` +
+            `6️⃣ - Consultar seu cupom`
+        );
+    }
+  
+    
 
   let usuario_responsavel="Loja01";
   let cliente_telefone = msg.from.split('@')[0];
