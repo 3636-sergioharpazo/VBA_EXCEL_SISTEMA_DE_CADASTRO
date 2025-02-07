@@ -241,9 +241,7 @@ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     await client.sendMessage(
         msg.from,
         `🌟 *Cadastro de Colaborador(a)* 🌟\n\n` +
-        `Digite *Nome Completo:* \n\n` +
-        `Digite *Data de Nascimento:* \n\n` +
-        `Escolha a loja onde você trabalha:\n` +
+        `Escolha a loja onde você trabalha:\n\n` +
         `🅰 Loja01\n` +
         `🅱 Loja02\n\n` +
         `Digite apenas a letra correspondente (*A* ou *B*).`
