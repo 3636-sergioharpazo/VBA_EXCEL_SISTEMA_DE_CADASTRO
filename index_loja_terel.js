@@ -136,19 +136,12 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 // Variáveis para armazenar os dados do cliente e do agendamento
 let cliente_nome = '';
 const clientesRespondidos = {}; // Cache para armazenar clientes que já responderam
-
-
-
-        
-
-        
-
-    
+     
+   
 
 
 client.on('message', async msg => {
-    if (!msg.from.endsWith('@c.us')) return;
-
+    
  if (/^(menu|Menu|dia|tarde|noite|oi|Oi|Voltar|voltar|Olá|olá|ola|Ola)$/i.test(msg.body) && msg.from.endsWith('@c.us')) {
         
    const chat = await msg.getChat();
@@ -183,7 +176,7 @@ try {
             });
             console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
             
-            await enviarMenu(msg, name);
+            
         } catch (error) {
             client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
             console.error("Erro ao enviar dados para API:", error);
