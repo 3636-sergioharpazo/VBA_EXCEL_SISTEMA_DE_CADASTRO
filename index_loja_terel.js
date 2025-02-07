@@ -162,10 +162,158 @@ client.on('message', async msg => {
             `6️⃣ - Consultar seu cupom`
         );
     
-  
+  // Menu 2
+ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
+  const chat = await msg.getChat();
+  await delay(2000);
+  await chat.sendStateTyping();
+  await delay(2000);
+
+  let cliente_nome = null;
+  let data_nascimento = null;
+  let protocolo = '';
+  let confirmacao = false;
+  let cliente_telefone = msg.from.split('@')[0];
+
+  async function solicitarCampo(mensagem, mensagemValidacao, regex = null, mensagemConfirmacao = '') {
+      let campoValido = false;
+      let campo = null;
+
+      while (!campoValido) {
+          await client.sendMessage(msg.from, mensagem);
+          const resposta = await esperarMensagem(msg.from);
+
+          if (resposta.toLowerCase() === 'menu') {
+              await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
+              return null;
+          }
+
+          if (regex && !regex.test(resposta)) {
+              await client.sendMessage(msg.from, mensagemValidacao);
+          } else {
+              campoValido = true;
+              campo = resposta;
+          }
+      }
+
+      if (mensagemConfirmacao) {
+          await client.sendMessage(msg.from, `✅ ${mensagemConfirmacao}: ${campo}`);
+      }
+
+      return campo;
+  }
+
+  async function esperarMensagem(user) {
+      return new Promise((resolve) => {
+          const listener = (response) => {
+              if (response.from === user) {
+                  client.off('message', listener);
+                  resolve(response.body.trim());
+              }
+          };
+          client.on('message', listener);
+      });
+  }
+
+  let lojas = {
+      "a": "Loja01",
+      "b": "Loja02"
+  };
+  let lojaEscolhida = null;
+
+  await client.sendMessage(
+      msg.from,
+      `🌟 *Cadastro de Colaborador(a)* 🌟\n\n` +
+      `Escolha a loja onde você trabalha:\n\n` +
+      `🅰 Loja01\n` +
+      `🅱 Loja02\n\n` +
+      `Digite apenas a letra correspondente (*A* ou *B*).`
+  );
+
+  while (!lojaEscolhida) {
+      let escolha = await esperarMensagem(msg.from);
+      escolha = escolha.toLowerCase();
+      if (escolha === 'menu') {
+          await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
+          return;
+      }
+      if (lojas[escolha]) {
+          lojaEscolhida = lojas[escolha];
+      } else {
+          await client.sendMessage(msg.from, '❌ Opção inválida! Digite *A* para Loja01 ou *B* para Loja02.');
+      }
+  }
+
+  cliente_nome = await solicitarCampo(
+      'Digite seu *Nome Completo:*',
+      '❌ Nome inválido. Por favor, envie seu nome completo sem números.', 
+      /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/,  
+      'Nome recebido'
+  );
+  if (!cliente_nome) return;
+
+  data_nascimento = await solicitarCampo(
+      'Digite sua *Data de Nascimento* (DD/MM/AAAA):',
+      '❌ Data inválida! Envie no formato DD/MM/AAAA.', 
+      /^\d{2}\/\d{2}\/\d{4}$/, 
+      'Data recebida'
+  );
+  if (!data_nascimento) return;
+
+  let email = `${cliente_telefone}@lojasterel.com.br`;
+
+  await client.sendMessage(
+      msg.from,
+      `📝 Confirme as informações:\n\n` +
+      `👤 Nome: ${cliente_nome}\n` +
+      `🏬 Loja: ${lojaEscolhida}\n` +
+      `📧 E-mail: ${email}\n` +
+      `📅 Data de Nascimento: ${data_nascimento}\n\n` +
+      `Digite *Sim* ✅ para confirmar\nDigite *Cancelar* ❌ para cancelar e voltar ao menu principal\nDigite *Menu* para retornar ao menu principal.`
+  );
+
+  const resposta = await esperarMensagem(msg.from);
+if (resposta.toLowerCase() !== 'sim') {
+  await client.sendMessage(msg.from, '❌ Cadastro cancelado. Retornando ao menu principal.');
+  return;
+}
+
+// Confirmação antes de enviar os dados
+await client.sendMessage(msg.from, '✅ Dados confirmados. Enviando informações...');
+
+try {
+  const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/processa_colaborador_bot.php', {
+      cliente_nome,
+      cliente_telefone,
+      loja: lojaEscolhida,
+      email,
+      data_nascimento
+  });
+
+  console.log(protocoloResponse.data); // Log para depuração
+
+  protocolo = protocoloResponse.data.protocolo || null; 
+} catch (error) {
+  console.error('Erro ao processar o protocolo:', error);
+  await client.sendMessage(msg.from, '❌ Houve um erro ao processar seus dados. Tente novamente.');
+}
+  if (protocolo) {
+          await client.sendMessage(
+              msg.from,
+              `✅ *Cadastro Confirmado!*\n` +
+              `📜 *Protocolo:* ${protocolo}\n` +
+              `👤 *Nome:* ${cliente_nome}\n` +
+              `🏬 *Loja:* ${lojaEscolhida}\n` +
+              `📧 *E-mail:* ${email}\n` +
+              `📅 *Data de Nascimento:* ${data_nascimento}`
+          );
+      } else {
+          await client.sendMessage(msg.from, '❌ Erro ao confirmar o cadastro. Tente novamente.');
+      }
+
     
  let usuario_responsavel = "Loja01";
-let cliente_telefone = msg.from.split('@')[0];
+//let cliente_telefone = msg.from.split('@')[0];
 
 // Variável controladora que vai armazenar os protocolos enviados
 let protocolosEnviadosHoje = {};
@@ -232,7 +380,7 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
             `🎉 *Promoções da Semana* 🎉\n\n` +
             `📝\n${listaServicos}\n` +
             `Aproveite essas ofertas incríveis! Válidas até sábado. 💅\n\n` + 
-            `Digite *2* para agendar seu horário!\n`
+            `Digite *2* para faça seu cadastro!\n`
         );
     }
 
@@ -250,154 +398,6 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
         );
     }
 
- // Menu 2
- if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
-    const chat = await msg.getChat();
-    await delay(2000);
-    await chat.sendStateTyping();
-    await delay(2000);
-
-    let cliente_nome = null;
-    let data_nascimento = null;
-    let protocolo = '';
-    let confirmacao = false;
-    let cliente_telefone = msg.from.split('@')[0];
-
-    async function solicitarCampo(mensagem, mensagemValidacao, regex = null, mensagemConfirmacao = '') {
-        let campoValido = false;
-        let campo = null;
-
-        while (!campoValido) {
-            await client.sendMessage(msg.from, mensagem);
-            const resposta = await esperarMensagem(msg.from);
-
-            if (resposta.toLowerCase() === 'menu') {
-                await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
-                return null;
-            }
-
-            if (regex && !regex.test(resposta)) {
-                await client.sendMessage(msg.from, mensagemValidacao);
-            } else {
-                campoValido = true;
-                campo = resposta;
-            }
-        }
-
-        if (mensagemConfirmacao) {
-            await client.sendMessage(msg.from, `✅ ${mensagemConfirmacao}: ${campo}`);
-        }
-
-        return campo;
-    }
-
-    async function esperarMensagem(user) {
-        return new Promise((resolve) => {
-            const listener = (response) => {
-                if (response.from === user) {
-                    client.off('message', listener);
-                    resolve(response.body.trim());
-                }
-            };
-            client.on('message', listener);
-        });
-    }
-
-    let lojas = {
-        "a": "Loja01",
-        "b": "Loja02"
-    };
-    let lojaEscolhida = null;
-
-    await client.sendMessage(
-        msg.from,
-        `🌟 *Cadastro de Colaborador(a)* 🌟\n\n` +
-        `Escolha a loja onde você trabalha:\n\n` +
-        `🅰 Loja01\n` +
-        `🅱 Loja02\n\n` +
-        `Digite apenas a letra correspondente (*A* ou *B*).`
-    );
-
-    while (!lojaEscolhida) {
-        let escolha = await esperarMensagem(msg.from);
-        escolha = escolha.toLowerCase();
-        if (escolha === 'menu') {
-            await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
-            return;
-        }
-        if (lojas[escolha]) {
-            lojaEscolhida = lojas[escolha];
-        } else {
-            await client.sendMessage(msg.from, '❌ Opção inválida! Digite *A* para Loja01 ou *B* para Loja02.');
-        }
-    }
-
-    cliente_nome = await solicitarCampo(
-        'Digite seu *Nome Completo:*',
-        '❌ Nome inválido. Por favor, envie seu nome completo sem números.', 
-        /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/,  
-        'Nome recebido'
-    );
-    if (!cliente_nome) return;
-
-    data_nascimento = await solicitarCampo(
-        'Digite sua *Data de Nascimento* (DD/MM/AAAA):',
-        '❌ Data inválida! Envie no formato DD/MM/AAAA.', 
-        /^\d{2}\/\d{2}\/\d{4}$/, 
-        'Data recebida'
-    );
-    if (!data_nascimento) return;
-
-    let email = `${cliente_telefone}@lojasterel.com.br`;
-
-    await client.sendMessage(
-        msg.from,
-        `📝 Confirme as informações:\n\n` +
-        `👤 Nome: ${cliente_nome}\n` +
-        `🏬 Loja: ${lojaEscolhida}\n` +
-        `📧 E-mail: ${email}\n` +
-        `📅 Data de Nascimento: ${data_nascimento}\n\n` +
-        `Digite *Sim* ✅ para confirmar\nDigite *Cancelar* ❌ para cancelar e voltar ao menu principal\nDigite *Menu* para retornar ao menu principal.`
-    );
-
-    const resposta = await esperarMensagem(msg.from);
- if (resposta.toLowerCase() !== 'sim') {
-    await client.sendMessage(msg.from, '❌ Cadastro cancelado. Retornando ao menu principal.');
-    return;
- }
-
- // Confirmação antes de enviar os dados
- await client.sendMessage(msg.from, '✅ Dados confirmados. Enviando informações...');
-
- try {
-    const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/processa_colaborador_bot.php', {
-        cliente_nome,
-        cliente_telefone,
-        loja: lojaEscolhida,
-        email,
-        data_nascimento
-    });
-
-    console.log(protocoloResponse.data); // Log para depuração
-
-    protocolo = protocoloResponse.data.protocolo || null; 
- } catch (error) {
-    console.error('Erro ao processar o protocolo:', error);
-    await client.sendMessage(msg.from, '❌ Houve um erro ao processar seus dados. Tente novamente.');
- }
-    if (protocolo) {
-            await client.sendMessage(
-                msg.from,
-                `✅ *Cadastro Confirmado!*\n` +
-                `📜 *Protocolo:* ${protocolo}\n` +
-                `👤 *Nome:* ${cliente_nome}\n` +
-                `🏬 *Loja:* ${lojaEscolhida}\n` +
-                `📧 *E-mail:* ${email}\n` +
-                `📅 *Data de Nascimento:* ${data_nascimento}`
-            );
-        } else {
-            await client.sendMessage(msg.from, '❌ Erro ao confirmar o cadastro. Tente novamente.');
-        }
  
 
     // Resposta para a opção "Serviços e Preços"
@@ -425,7 +425,7 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
             msg.from,
             `💇‍♀️ *Produtos e Preços* 💇‍♂️\n\n` +
             `📦 *Confira nossos produtos e preços abaixo:*\n${listaServicos}\n\n` +
-            `🔹 Digite *2* para agendar seu horário!`
+            `🔹 Digite *2* para faça seu cadastro!`
         );
     }
 
