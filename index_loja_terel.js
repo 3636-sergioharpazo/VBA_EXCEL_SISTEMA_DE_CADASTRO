@@ -327,11 +327,8 @@ try {
         } else {
             await client.sendMessage(msg.from, '❌ Erro ao confirmar o cadastro. Tente novamente.');
         }
-    } catch (error) {
-        console.error('Erro ao processar cadastro:', error);
-        await client.sendMessage(msg.from, '❌ Erro ao confirmar o cadastro. Tente novamente.');
-    }
-}
+ 
+
     // Resposta para a opção "Serviços e Preços"
     if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
       const chat = await msg.getChat();
