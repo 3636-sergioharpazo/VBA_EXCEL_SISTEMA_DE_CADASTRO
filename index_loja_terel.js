@@ -164,11 +164,11 @@ client.on('message', async msg => {
     
   
     
-let usuario_responsavel = "Loja01";
-let cliente_telefone = msg.from.split('@')[0];
+ let usuario_responsavel = "Loja01";
+ let cliente_telefone = msg.from.split('@')[0];
 
-// Função para verificar se já foi enviado protocolo para o cliente no mesmo dia
-async function verificarProtocoloHoje(cliente_telefone) {
+ // Função para verificar se já foi enviado protocolo para o cliente no mesmo dia
+ async function verificarProtocoloHoje(cliente_telefone) {
     const dataHoje = new Date().toISOString().split('T')[0]; // Pega a data no formato YYYY-MM-DD
 
     try {
@@ -182,12 +182,12 @@ async function verificarProtocoloHoje(cliente_telefone) {
         console.error("Erro ao verificar protocolo:", erro);
         return false; // Se houver erro, consideramos que não existe protocolo
     }
-}
+  }
 
-// Verificando se já foi enviado um protocolo para o cliente hoje
-const protocoloEnviadoHoje = await verificarProtocoloHoje(cliente_telefone);
+ // Verificando se já foi enviado um protocolo para o cliente hoje
+ const protocoloEnviadoHoje = await verificarProtocoloHoje(cliente_telefone);
 
-if (!protocoloEnviadoHoje) {
+ if (!protocoloEnviadoHoje) {
     // Se não foi enviado, faz o envio do protocolo
     await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
         cliente_nome: name,
@@ -551,9 +551,12 @@ if (!protocoloEnviadoHoje) {
             }
         })();
     }
- }
-
+  }
+}
+ 
 });
+
+
 
 // Função delay
 /*async function delay(ms) {
