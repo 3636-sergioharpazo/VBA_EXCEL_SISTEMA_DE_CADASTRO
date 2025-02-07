@@ -180,7 +180,7 @@ client.on('message', async msg => {
         }
 
  // Menu 2
-if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
+ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     const chat = await msg.getChat();
     await delay(2000);
     await chat.sendStateTyping();
@@ -290,15 +290,15 @@ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     );
 
     const resposta = await esperarMensagem(msg.from);
-if (resposta.toLowerCase() !== 'sim') {
+ if (resposta.toLowerCase() !== 'sim') {
     await client.sendMessage(msg.from, '❌ Cadastro cancelado. Retornando ao menu principal.');
     return;
-}
+ }
 
-// Confirmação antes de enviar os dados
-await client.sendMessage(msg.from, '✅ Dados confirmados. Enviando informações...');
+ // Confirmação antes de enviar os dados
+ await client.sendMessage(msg.from, '✅ Dados confirmados. Enviando informações...');
 
-try {
+ try {
     const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/processa_colaborador_bot.php', {
         cliente_nome,
         cliente_telefone,
@@ -309,11 +309,11 @@ try {
 
     console.log(protocoloResponse.data); // Log para depuração
 
-    protocolo = protocoloResponse.data.protocolo || null;
-} catch (error) {
+    protocolo = protocoloResponse.data.protocolo || null; 
+ } catch (error) {
     console.error('Erro ao processar o protocolo:', error);
     await client.sendMessage(msg.from, '❌ Houve um erro ao processar seus dados. Tente novamente.');
-}
+ }
     if (protocolo) {
             await client.sendMessage(
                 msg.from,
@@ -527,9 +527,9 @@ try {
                 await client.sendMessage(msg.from, '❌ Erro ao cadastrar, tente novamente!');
             }
         })();
-    }
+    
 
-})
+});
 
 // Função delay
 /*async function delay(ms) {
