@@ -527,7 +527,8 @@ client.on('message', async msg => {
                 await client.sendMessage(msg.from, '❌ Erro ao cadastrar, tente novamente!');
             }
         })();
-    
+    }
+ }
 
 });
 
