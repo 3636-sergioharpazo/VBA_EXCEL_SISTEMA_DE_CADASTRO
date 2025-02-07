@@ -560,7 +560,7 @@ async function enviarFelizAniversario() {
         const response = await axios.get('http://lojamaster.antoniooliveira.shop/consultar-data_nascimento_bot.php');
 
         // Debug: imprimir a resposta
-        console.log('📌 Resposta da API:', response.data);
+        //console.log('📌 Resposta da API:', response.data);
 
         // Verifica se há aniversariantes
         if (!response || !response.data || !Array.isArray(response.data.usuarios) || response.data.usuarios.length === 0) {
