@@ -273,15 +273,15 @@ client.on('message', async msg => {
   );
 
   const resposta = await esperarMensagem(msg.from);
-if (resposta.toLowerCase() !== 'sim') {
+ if (resposta.toLowerCase() !== 'sim') {
   await client.sendMessage(msg.from, '❌ Cadastro cancelado. Retornando ao menu principal.');
   return;
-}
+ }
 
-// Confirmação antes de enviar os dados
-await client.sendMessage(msg.from, '✅ Dados confirmados. Enviando informações...');
+ // Confirmação antes de enviar os dados
+ await client.sendMessage(msg.from, '✅ Dados confirmados. Enviando informações...');
 
-try {
+ try {
   const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/processa_colaborador_bot.php', {
       cliente_nome,
       cliente_telefone,
@@ -293,10 +293,10 @@ try {
   console.log(protocoloResponse.data); // Log para depuração
 
   protocolo = protocoloResponse.data.protocolo || null; 
-} catch (error) {
+ } catch (error) {
   console.error('Erro ao processar o protocolo:', error);
   await client.sendMessage(msg.from, '❌ Houve um erro ao processar seus dados. Tente novamente.');
-}
+ }
   if (protocolo) {
           await client.sendMessage(
               msg.from,
@@ -313,16 +313,16 @@ try {
 
     
  let usuario_responsavel = "Loja01";
-//let cliente_telefone = msg.from.split('@')[0];
+ //let cliente_telefone = msg.from.split('@')[0];
 
-// Variável controladora que vai armazenar os protocolos enviados
-let protocolosEnviadosHoje = {};
+ // Variável controladora que vai armazenar os protocolos enviados
+ let protocolosEnviadosHoje = {};
 
-// Obtendo a data de hoje no formato YYYY-MM-DD
-const dataHoje = new Date().toISOString().split('T')[0];
+ // Obtendo a data de hoje no formato YYYY-MM-DD
+ const dataHoje = new Date().toISOString().split('T')[0];
 
-// Verificando se o protocolo já foi enviado para o cliente hoje
-if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_telefone] !== dataHoje) {
+ // Verificando se o protocolo já foi enviado para o cliente hoje
+ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_telefone] !== dataHoje) {
     // Se não foi enviado, faz o envio do protocolo
     await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
         cliente_nome: name,
@@ -334,12 +334,12 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
     protocolosEnviadosHoje[cliente_telefone] = dataHoje;
 
     console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
-} else {
+ } else {
     console.log("Protocolo já enviado hoje para", cliente_telefone);
-}
+ }
 
     // Resposta para "Localização"
-    if (msg.body.trim() === '4' && msg.from.endsWith('@c.us')) {
+if (msg.body.trim() === '4' && msg.from.endsWith('@c.us')) {
       const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
@@ -355,7 +355,7 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
     }
 
     // Resposta para "Promoções da Semana"
-    if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) {
+if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) {
       const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
@@ -385,7 +385,7 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
     }
 
     // Resposta para "Outras Dúvidas"
-    if (msg.body.trim() === '5' && msg.from.endsWith('@c.us')) {
+if (msg.body.trim() === '5' && msg.from.endsWith('@c.us')) {
       const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
@@ -401,7 +401,7 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
  
 
     // Resposta para a opção "Serviços e Preços"
-    if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
+if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
       const chat = await msg.getChat();
         await delay(2000);
         await chat.sendStateTyping();
@@ -431,7 +431,7 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
 
   
     // Menu 2: Ganhar Brindes
-    if (msg.body.trim() === '2' && msg.from.endsWith('@c.us')) {
+if (msg.body.trim() === '2' && msg.from.endsWith('@c.us')) {
         (async () => {
             const chat = await msg.getChat();
             await delay(2000);
@@ -605,7 +605,7 @@ const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Em nome da fa
             const mensagemCheve = `🎉 Olá Excelente Boss! 🎂 Hoje temos uma colaboradora fazendo aniversário! 🎈\n\n👤 Nome: ${cliente_nome}\n📞 Telefone: ${cliente_telefone}\n🏬 Loja: ${loja_colaborador}\n\nVamos celebrar! 🎉🎁`;
 
             // Número de telefone da Cheve
-            const numeroCheve = '5511962689478@c.us';  // Número da Cheve
+            const numeroCheve = '5511958261897@c.us';  // Número da Cheve
 
             try {
                 // Envia a mensagem para o WhatsApp da Cheve
