@@ -165,41 +165,30 @@ client.on('message', async msg => {
   
     
  let usuario_responsavel = "Loja01";
- let cliente_telefone = msg.from.split('@')[0];
+let cliente_telefone = msg.from.split('@')[0];
 
- // Função para verificar se já foi enviado protocolo para o cliente no mesmo dia
- async function verificarProtocoloHoje(cliente_telefone) {
-    const dataHoje = new Date().toISOString().split('T')[0]; // Pega a data no formato YYYY-MM-DD
+// Variável controladora que vai armazenar os protocolos enviados
+let protocolosEnviadosHoje = {};
 
-    try {
-        const resposta = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/verificar_protocolo.php', {
-            cliente_telefone,
-            data_hoje: dataHoje
-        });
-        
-        return resposta.data.existeProtocolo; // Supondo que a resposta traga um campo "existeProtocolo"
-    } catch (erro) {
-        console.error("Erro ao verificar protocolo:", erro);
-        return false; // Se houver erro, consideramos que não existe protocolo
-    }
-  }
+// Obtendo a data de hoje no formato YYYY-MM-DD
+const dataHoje = new Date().toISOString().split('T')[0];
 
- // Verificando se já foi enviado um protocolo para o cliente hoje
- const protocoloEnviadoHoje = await verificarProtocoloHoje(cliente_telefone);
-
- if (!protocoloEnviadoHoje) {
+// Verificando se o protocolo já foi enviado para o cliente hoje
+if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_telefone] !== dataHoje) {
     // Se não foi enviado, faz o envio do protocolo
     await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
         cliente_nome: name,
         cliente_telefone,
         usuario_responsavel
     });
+
+    // Marca que o protocolo foi enviado hoje para este cliente
+    protocolosEnviadosHoje[cliente_telefone] = dataHoje;
+
     console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
 } else {
     console.log("Protocolo já enviado hoje para", cliente_telefone);
 }
-
-
 
     // Resposta para "Localização"
     if (msg.body.trim() === '4' && msg.from.endsWith('@c.us')) {
@@ -631,5 +620,5 @@ async function enviarFelizAniversario() {
 }
 
 // Executa imediatamente e depois a cada 2 minutos
-setInterval(enviarFelizAniversario, 2 * 60 * 1000);
+setInterval(enviarFelizAniversario, 10 * 60 * 1000);
 enviarFelizAniversario();
