@@ -161,7 +161,7 @@ client.on('message', async msg => {
             `5️⃣ - Outras dúvidas\n` +
             `6️⃣ - Consultar seu cupom`
         );
-    
+      }
   // Menu 2
  if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
   const chat = await msg.getChat();
@@ -541,7 +541,7 @@ if (!protocolosEnviadosHoje[cliente_telefone] || protocolosEnviadosHoje[cliente_
         })();
     }
   }
-}
+
  
 });
 
