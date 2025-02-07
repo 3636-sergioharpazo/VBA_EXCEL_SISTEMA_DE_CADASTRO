@@ -164,20 +164,41 @@ client.on('message', async msg => {
     
   
     
+let usuario_responsavel = "Loja01";
+let cliente_telefone = msg.from.split('@')[0];
 
-  let usuario_responsavel="Loja01";
-  let cliente_telefone = msg.from.split('@')[0];
-  
+// Função para verificar se já foi enviado protocolo para o cliente no mesmo dia
+async function verificarProtocoloHoje(cliente_telefone) {
+    const dataHoje = new Date().toISOString().split('T')[0]; // Pega a data no formato YYYY-MM-DD
 
-            await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
-                cliente_nome: name,
-                cliente_telefone,
-                usuario_responsavel
-            });
-            console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
-            
-            
-        }
+    try {
+        const resposta = await axios.post('https://lojamaster.antoniooliveira.shop/Bot/verificar_protocolo.php', {
+            cliente_telefone,
+            data_hoje: dataHoje
+        });
+        
+        return resposta.data.existeProtocolo; // Supondo que a resposta traga um campo "existeProtocolo"
+    } catch (erro) {
+        console.error("Erro ao verificar protocolo:", erro);
+        return false; // Se houver erro, consideramos que não existe protocolo
+    }
+}
+
+// Verificando se já foi enviado um protocolo para o cliente hoje
+const protocoloEnviadoHoje = await verificarProtocoloHoje(cliente_telefone);
+
+if (!protocoloEnviadoHoje) {
+    // Se não foi enviado, faz o envio do protocolo
+    await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
+        cliente_nome: name,
+        cliente_telefone,
+        usuario_responsavel
+    });
+    console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
+} else {
+    console.log("Protocolo já enviado hoje para", cliente_telefone);
+}
+
 
 
     // Resposta para "Localização"
@@ -559,11 +580,17 @@ async function enviarFelizAniversario() {
 
         // Envia mensagem para cada usuário e também para o WhatsApp da Cheve
         for (const usuario of usuarios) {
-            const { nome: cliente_nome, cliente_telefone } = usuario;
+            // Verificar se o nome está correto na resposta da API
+            const cliente_nome = usuario.cliente_nome ? usuario.cliente_nome.trim() : "Anônimo"; // Tratar espaços extras no nome
+            const cliente_telefone = usuario.cliente_telefone;
+            const loja_colaborador = usuario.loja_colaborador; // A loja do colaborador (classe)
+
+            // Debug: verificar valores de cliente_nome e cliente_telefone
+            console.log(`🎉 Enviando mensagem para ${cliente_nome}, Telefone: ${cliente_telefone}, Loja: ${loja_colaborador}`);
 
             // Cria a mensagem de aniversário para o usuário
             const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Desejamos um dia maravilhoso e cheio de alegrias! 🎈🎁`;
-            
+
             // Formata o número de telefone no formato do WhatsApp
             const numeroWhatsApp = `${cliente_telefone.replace(/\D/g, '')}@c.us`;
 
@@ -581,11 +608,11 @@ async function enviarFelizAniversario() {
                 console.error(`❌ Erro ao enviar mensagem para ${cliente_nome}: ${error.message || error}`);
             }
 
-            // Envia a mensagem para o WhatsApp da Cheve, com o nome e telefone da colaboradora
-            const mensagemCheve = `🎉 Olá Excelente Boss! 🎂 Hoje temos uma colaboradora fazendo aniversário! 🎈\n\n👤 Nome: ${cliente_nome}\n📞 Telefone: ${cliente_telefone}\n\nVamos celebrar! 🎉🎁`;
+            // Envia a mensagem para o WhatsApp da Cheve, com o nome, telefone e loja do colaborador
+            const mensagemCheve = `🎉 Olá Excelente Boss! 🎂 Hoje temos uma colaboradora fazendo aniversário! 🎈\n\n👤 Nome: ${cliente_nome}\n📞 Telefone: ${cliente_telefone}\n🏬 Loja: ${loja_colaborador}\n\nVamos celebrar! 🎉🎁`;
 
             // Número de telefone da Cheve
-            const numeroCheve = '5511962689478@c.us';
+            const numeroCheve = '5511962689478@c.us';  // Número da Cheve
 
             try {
                 // Envia a mensagem para o WhatsApp da Cheve
