@@ -161,14 +161,14 @@ client.on('message', async msg => {
             `5️⃣ - Outras dúvidas\n` +
             `6️⃣ - Consultar seu cupom`
         );
-    }
+    
   
     
 
   let usuario_responsavel="Loja01";
   let cliente_telefone = msg.from.split('@')[0];
   
-try {
+
             await axios.post('https://lojamaster.antoniooliveira.shop/Bot/gerar_protocolo.php', {
                 cliente_nome: name,
                 cliente_telefone,
@@ -177,14 +177,10 @@ try {
             console.log("Cadastro disparado com sucesso para", usuario_responsavel, name, cliente_telefone);
             
             
-        } catch (error) {
-            client.sendMessage(msg.from, '❌ Erro ao tentar registrar. Tente novamente.');
-            console.error("Erro ao enviar dados para API:", error);
         }
-    
- 
-// Menu 2
-if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
+
+ // Menu 2
+ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     const chat = await msg.getChat();
     await delay(2000);
     await chat.sendStateTyping();
@@ -329,8 +325,8 @@ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     } catch (error) {
         await client.sendMessage(msg.from, '❌ Erro ao confirmar o cadastro. Tente novamente.');
     }
-}
-  
+
+ }
     // Resposta para a opção "Serviços e Preços"
     if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
       const chat = await msg.getChat();
@@ -530,7 +526,8 @@ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
             }
         })();
     }
-});
+
+})
 
 // Função delay
 /*async function delay(ms) {
