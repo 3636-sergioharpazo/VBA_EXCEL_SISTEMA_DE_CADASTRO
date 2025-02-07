@@ -613,15 +613,7 @@ async function enviarFelizAniversario() {
 // Para escolher uma mensagem aleatória:
 const mensagemAniversario = mensagensAniversario[Math.floor(Math.random() * mensagensAniversario.length)];
 
-          
-          
-          
-          
-          
-          
-          
-          
-          
+                    
           // Formata o número de telefone no formato do WhatsApp
             const numeroWhatsApp = `${cliente_telefone.replace(/\D/g, '')}@c.us`;
 
