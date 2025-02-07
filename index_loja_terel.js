@@ -581,7 +581,8 @@ async function enviarFelizAniversario() {
             console.log(`🎉 Enviando mensagem para ${cliente_nome}, Telefone: ${cliente_telefone}, Loja: ${loja_colaborador}`);
 
             // Cria a mensagem de aniversário para o usuário
-            const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Desejamos um dia maravilhoso e cheio de alegrias! 🎈🎁`;
+            //const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Desejamos um dia maravilhoso e cheio de alegrias! 🎈🎁`;
+const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Em nome da família Terel, desejamos a você um dia repleto de felicidade, amor e momentos inesquecíveis. Que este novo ano de vida seja ainda mais próspero e cheio de realizações! 🎈🎁 Que seus sonhos se tornem realidade e que você continue brilhando como sempre! 💖`;
 
             // Formata o número de telefone no formato do WhatsApp
             const numeroWhatsApp = `${cliente_telefone.replace(/\D/g, '')}@c.us`;
