@@ -182,21 +182,7 @@ try {
             console.error("Erro ao enviar dados para API:", error);
         }
     
-    // Sempre pergunta sobre a região do Grajaú primeiro
-   // await perguntarRegiao(msg, name);
-
-    if (/^(menu|bom dia|boa noite|oi|olá|ola)$/i.test(msg.body.trim())) {
-        await enviarMenu(msg, name);
-        return;
-    }
-
-    if (/^[1-5]$/.test(msg.body.trim())) {
-        await msg.body.trim()
-        return;
-    }
-
-//
-
+ 
 // Menu 2
 if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     const chat = await msg.getChat();
