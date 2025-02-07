@@ -546,7 +546,7 @@ async function enviarFelizAniversario() {
         const response = await axios.get('http://lojamaster.antoniooliveira.shop/consultar-data_nascimento_bot.php'); 
 
         // Verifica se há aniversariantes
-        if (!response.data || !Array.isArray(response.data.usuarios) || response.data.usuarios.length === 0) {
+        if (!response || !response.data || !Array.isArray(response.data.usuarios) || response.data.usuarios.length === 0) {
             console.log('⚠️ Nenhum aniversário encontrado hoje.');
             return;
         }
@@ -561,7 +561,7 @@ async function enviarFelizAniversario() {
             const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Desejamos um dia maravilhoso e cheio de alegrias! 🎈🎁`;
             
             // Formata o número de telefone no formato do WhatsApp para o usuário
-            const numeroWhatsApp = `${cliente_telefone}@c.us`; 
+            const numeroWhatsApp = `${cliente_telefone.replace(/\D/g, '')}@c.us`; 
 
             // Verifica se a função client.sendMessage está disponível
             if (!client || !client.sendMessage) {
@@ -569,9 +569,13 @@ async function enviarFelizAniversario() {
                 return;
             }
 
-            // Envia a mensagem de aniversário para o usuário
-            await client.sendMessage(numeroWhatsApp, mensagemAniversario);
-            console.log(`🎉 Mensagem de aniversário enviada para ${cliente_nome} no número ${cliente_telefone}`);
+            try {
+                // Envia a mensagem de aniversário para o usuário
+                await client.sendMessage(numeroWhatsApp, mensagemAniversario);
+                console.log(`🎉 Mensagem de aniversário enviada para ${cliente_nome} no número ${cliente_telefone}`);
+            } catch (error) {
+                console.error(`❌ Erro ao enviar mensagem para ${cliente_nome}: ${error.message || error}`);
+            }
 
             // Envia a mensagem para o WhatsApp da Cheve, com o nome e telefone da colaboradora
             const mensagemCheve = `🎉 Olá Excelente Boss! 🎂 Hoje temos uma colaboradora fazendo aniversário! 🎈\n\n👤 Nome: ${cliente_nome}\n📞 Telefone: ${cliente_telefone}\n\nVamos celebrar! 🎉🎁`;
@@ -579,15 +583,18 @@ async function enviarFelizAniversario() {
             // Número de telefone da Cheve
             const numeroCheve = '5511962689478@c.us';  // Número da Cheve
 
-            // Envia a mensagem para o WhatsApp da Cheve
-            await client.sendMessage(numeroCheve, mensagemCheve);
-            console.log(`📩 Mensagem enviada para o WhatsApp da Cheve sobre o aniversário de ${cliente_nome}`);
+            try {
+                // Envia a mensagem para o WhatsApp da Cheve
+                await client.sendMessage(numeroCheve, mensagemCheve);
+                console.log(`📩 Mensagem enviada para o WhatsApp da Cheve sobre o aniversário de ${cliente_nome}`);
+            } catch (error) {
+                console.error(`❌ Erro ao enviar mensagem para a Cheve: ${error.message || error}`);
+            }
         }
     } catch (error) {
         console.error('❌ Erro ao buscar aniversariantes:', error.message || error);
     }
 }
-
 // Chama a função imediatamente e depois de 24 horas
 //setInterval(enviarFelizAniversario, 24 * 60 * 60 * 1000);
 setInterval(enviarFelizAniversario, 2 * 60 * 1000);
