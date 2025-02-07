@@ -290,25 +290,31 @@ if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     );
 
     const resposta = await esperarMensagem(msg.from);
-    if (resposta.toLowerCase() !== 'sim') {
-        await client.sendMessage(msg.from, '❌ Cadastro cancelado. Retornando ao menu principal.');
-        return;
-    }
+if (resposta.toLowerCase() !== 'sim') {
+    await client.sendMessage(msg.from, '❌ Cadastro cancelado. Retornando ao menu principal.');
+    return;
+}
 
-    try {
-        const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/processa_colaborador_bot.php', {
-            cliente_nome,
-            cliente_telefone,
-            loja: lojaEscolhida,
-            email,          
-            data_nascimento
-        });
+// Confirmação antes de enviar os dados
+await client.sendMessage(msg.from, '✅ Dados confirmados. Enviando informações...');
 
-        console.log(protocoloResponse.data); // Log para depuração
+try {
+    const protocoloResponse = await axios.post('https://lojamaster.antoniooliveira.shop/processa_colaborador_bot.php', {
+        cliente_nome,
+        cliente_telefone,
+        loja: lojaEscolhida,
+        email,
+        data_nascimento
+    });
 
-        protocolo = protocoloResponse.data.protocolo || null;
+    console.log(protocoloResponse.data); // Log para depuração
 
-        if (protocolo) {
+    protocolo = protocoloResponse.data.protocolo || null;
+} catch (error) {
+    console.error('Erro ao processar o protocolo:', error);
+    await client.sendMessage(msg.from, '❌ Houve um erro ao processar seus dados. Tente novamente.');
+}
+    if (protocolo) {
             await client.sendMessage(
                 msg.from,
                 `✅ *Cadastro Confirmado!*\n` +
