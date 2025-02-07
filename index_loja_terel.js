@@ -179,6 +179,67 @@ client.on('message', async msg => {
             
         }
 
+
+    // Resposta para "Localização"
+    if (msg.body.trim() === '4' && msg.from.endsWith('@c.us')) {
+      const chat = await msg.getChat();
+        await delay(2000);
+        await chat.sendStateTyping();
+        await delay(2000);
+
+        await client.sendMessage(
+            msg.from,
+            `📍 *Localização das Lojas Terel* 📍\n\n` +
+            `Endereço: Vila São José, Centro\n` +
+            `Cidade: São Paulo - SP\n\n` +
+            `Estamos ansiosos para sua visita! 😊`
+        );
+    }
+
+    // Resposta para "Promoções da Semana"
+    if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) {
+      const chat = await msg.getChat();
+        await delay(2000);
+        await chat.sendStateTyping();
+        await delay(2000);
+
+        let servicosDisponiveis = {};
+        try {
+            const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot_p.php');
+            servicosDisponiveis = response.data.servicos;
+        } catch (error) {
+            console.error('Erro ao carregar serviços:', error);
+            await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
+            return;
+        }
+
+        const listaServicos = Object.entries(servicosDisponiveis)
+            .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
+            .join('\n');
+
+        await client.sendMessage(
+            msg.from,
+            `🎉 *Promoções da Semana* 🎉\n\n` +
+            `📝\n${listaServicos}\n` +
+            `Aproveite essas ofertas incríveis! Válidas até sábado. 💅\n\n` + 
+            `Digite *2* para agendar seu horário!\n`
+        );
+    }
+
+    // Resposta para "Outras Dúvidas"
+    if (msg.body.trim() === '5' && msg.from.endsWith('@c.us')) {
+      const chat = await msg.getChat();
+        await delay(2000);
+        await chat.sendStateTyping();
+        await delay(2000);
+
+        await client.sendMessage(
+            msg.from,
+            `❓ *Outras Dúvidas* ❓\n\n` +
+            `Por favor, descreva sua dúvida que entraremos em contato para ajudá-lo(a).`
+        );
+    }
+
  // Menu 2
  if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     const chat = await msg.getChat();
@@ -358,66 +419,7 @@ client.on('message', async msg => {
         );
     }
 
-    // Resposta para "Localização"
-    if (msg.body.trim() === '4' && msg.from.endsWith('@c.us')) {
-      const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        await client.sendMessage(
-            msg.from,
-            `📍 *Localização das Lojas Terel* 📍\n\n` +
-            `Endereço: Vila São José, Centro\n` +
-            `Cidade: São Paulo - SP\n\n` +
-            `Estamos ansiosos para sua visita! 😊`
-        );
-    }
-
-    // Resposta para "Promoções da Semana"
-    if (msg.body.trim() === '3' && msg.from.endsWith('@c.us')) {
-      const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        let servicosDisponiveis = {};
-        try {
-            const response = await axios.get('https://lojamaster.antoniooliveira.shop/Bot/consultar-servicos_bot_p.php');
-            servicosDisponiveis = response.data.servicos;
-        } catch (error) {
-            console.error('Erro ao carregar serviços:', error);
-            await client.sendMessage(msg.from, '❌ Erro ao consultar serviços. Tente novamente mais tarde.');
-            return;
-        }
-
-        const listaServicos = Object.entries(servicosDisponiveis)
-            .map(([codigo, { nome, preco }]) => ` ${nome} - R$ ${preco}`)
-            .join('\n');
-
-        await client.sendMessage(
-            msg.from,
-            `🎉 *Promoções da Semana* 🎉\n\n` +
-            `📝\n${listaServicos}\n` +
-            `Aproveite essas ofertas incríveis! Válidas até sábado. 💅\n\n` + 
-            `Digite *2* para agendar seu horário!\n`
-        );
-    }
-
-    // Resposta para "Outras Dúvidas"
-    if (msg.body.trim() === '5' && msg.from.endsWith('@c.us')) {
-      const chat = await msg.getChat();
-        await delay(2000);
-        await chat.sendStateTyping();
-        await delay(2000);
-
-        await client.sendMessage(
-            msg.from,
-            `❓ *Outras Dúvidas* ❓\n\n` +
-            `Por favor, descreva sua dúvida que entraremos em contato para ajudá-lo(a).`
-        );
-    }
-
+  
     // Menu 2: Ganhar Brindes
     if (msg.body.trim() === '2' && msg.from.endsWith('@c.us')) {
         (async () => {
@@ -596,7 +598,7 @@ async function enviarFelizAniversario() {
     }
 }
 // Chama a função imediatamente e depois de 24 horas
-setInterval(enviarFelizAniversario, 24 * 60 * 60 * 1000);
-//setInterval(enviarFelizAniversario, 2 * 60 * 1000);
+//setInterval(enviarFelizAniversario, 24 * 60 * 60 * 1000);
+setInterval(enviarFelizAniversario, 2 * 60 * 1000);
 // Opcional: Se quiser chamar a função imediatamente também ao iniciar o script
 enviarFelizAniversario();
