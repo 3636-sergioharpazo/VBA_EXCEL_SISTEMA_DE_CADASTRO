@@ -180,43 +180,43 @@ client.on('message', async msg => {
         }
 
  // Menu 2
- if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
+if (msg.body.trim().toLowerCase() === 'c' && msg.from.endsWith('@c.us')) {
     const chat = await msg.getChat();
     await delay(2000);
     await chat.sendStateTyping();
     await delay(2000);
 
-    let cliente_nome = '';
-    let data_nascimento = '';
+    let cliente_nome = null;
+    let data_nascimento = null;
     let protocolo = '';
     let confirmacao = false;
     let cliente_telefone = msg.from.split('@')[0];
 
-    async function solicitarCampo(campo, mensagemValidacao, regex = null, mensagemConfirmacao = '') {
+    async function solicitarCampo(mensagem, mensagemValidacao, regex = null, mensagemConfirmacao = '') {
         let campoValido = false;
+        let campo = null;
+
         while (!campoValido) {
-            if (!campo || (regex && !regex.test(campo))) {
-                if (campo && regex && !regex.test(campo)) {
-                    await client.sendMessage(msg.from, mensagemValidacao);
-                }
-                const resposta = await esperarMensagem(msg.from);
-                if (resposta.toLowerCase() === 'menu') {
-                    await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
-                    return null;
-                }
-                campo = resposta;
+            await client.sendMessage(msg.from, mensagem);
+            const resposta = await esperarMensagem(msg.from);
+
+            if (resposta.toLowerCase() === 'menu') {
+                await client.sendMessage(msg.from, '🔙 Retornando ao menu principal.');
+                return null;
             }
 
-            if (regex && !regex.test(campo)) {
+            if (regex && !regex.test(resposta)) {
                 await client.sendMessage(msg.from, mensagemValidacao);
             } else {
                 campoValido = true;
+                campo = resposta;
             }
         }
 
         if (mensagemConfirmacao) {
             await client.sendMessage(msg.from, `✅ ${mensagemConfirmacao}: ${campo}`);
         }
+
         return campo;
     }
 
@@ -225,7 +225,7 @@ client.on('message', async msg => {
             const listener = (response) => {
                 if (response.from === user) {
                     client.off('message', listener);
-                    resolve(response.body);
+                    resolve(response.body.trim());
                 }
             };
             client.on('message', listener);
@@ -242,6 +242,7 @@ client.on('message', async msg => {
         msg.from,
         `🌟 *Cadastro de Colaborador(a)* 🌟\n\n` +
         `Digite *Nome Completo:* \n\n` +
+        `Digite *Data de Nascimento:* \n\n` +
         `Escolha a loja onde você trabalha:\n` +
         `🅰 Loja01\n` +
         `🅱 Loja02\n\n` +
@@ -263,7 +264,7 @@ client.on('message', async msg => {
     }
 
     cliente_nome = await solicitarCampo(
-        null, 
+        'Digite seu *Nome Completo:*',
         '❌ Nome inválido. Por favor, envie seu nome completo sem números.', 
         /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/,  
         'Nome recebido'
@@ -271,7 +272,7 @@ client.on('message', async msg => {
     if (!cliente_nome) return;
 
     data_nascimento = await solicitarCampo(
-        null, 
+        'Digite sua *Data de Nascimento* (DD/MM/AAAA):',
         '❌ Data inválida! Envie no formato DD/MM/AAAA.', 
         /^\d{2}\/\d{2}\/\d{4}$/, 
         'Data recebida'
@@ -291,9 +292,7 @@ client.on('message', async msg => {
     );
 
     const resposta = await esperarMensagem(msg.from);
-    if (resposta.toLowerCase() === 'sim') {
-        confirmacao = true;
-    } else {
+    if (resposta.toLowerCase() !== 'sim') {
         await client.sendMessage(msg.from, '❌ Cadastro cancelado. Retornando ao menu principal.');
         return;
     }
@@ -307,7 +306,9 @@ client.on('message', async msg => {
             data_nascimento
         });
 
-        protocolo = protocoloResponse.data.protocolo;
+        console.log(protocoloResponse.data); // Log para depuração
+
+        protocolo = protocoloResponse.data.protocolo || null;
 
         if (protocolo) {
             await client.sendMessage(
@@ -323,10 +324,10 @@ client.on('message', async msg => {
             await client.sendMessage(msg.from, '❌ Erro ao confirmar o cadastro. Tente novamente.');
         }
     } catch (error) {
+        console.error('Erro ao processar cadastro:', error);
         await client.sendMessage(msg.from, '❌ Erro ao confirmar o cadastro. Tente novamente.');
     }
-
- }
+}
     // Resposta para a opção "Serviços e Preços"
     if (msg.body.trim() === '1' && msg.from.endsWith('@c.us')) {
       const chat = await msg.getChat();
