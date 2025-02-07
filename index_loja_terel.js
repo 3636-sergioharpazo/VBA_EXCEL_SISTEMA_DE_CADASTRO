@@ -596,7 +596,7 @@ async function enviarFelizAniversario() {
     }
 }
 // Chama a função imediatamente e depois de 24 horas
-//setInterval(enviarFelizAniversario, 24 * 60 * 60 * 1000);
-setInterval(enviarFelizAniversario, 2 * 60 * 1000);
+setInterval(enviarFelizAniversario, 24 * 60 * 60 * 1000);
+//setInterval(enviarFelizAniversario, 2 * 60 * 1000);
 // Opcional: Se quiser chamar a função imediatamente também ao iniciar o script
 enviarFelizAniversario();
