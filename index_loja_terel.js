@@ -582,9 +582,47 @@ async function enviarFelizAniversario() {
 
             // Cria a mensagem de aniversário para o usuário
             //const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Desejamos um dia maravilhoso e cheio de alegrias! 🎈🎁`;
-const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Em nome da família Terel, desejamos a você um dia repleto de felicidade, amor e momentos inesquecíveis. Que este novo ano de vida seja ainda mais próspero e cheio de realizações! 🎈🎁 Que seus sonhos se tornem realidade e que você continue brilhando como sempre! 💖`;
+//const mensagemAniversario = `🎉 Parabéns, ${cliente_nome}! 🎂 Em nome da família Terel, desejamos a você um dia repleto de felicidade, amor e momentos inesquecíveis. Que este novo ano de vida seja ainda mais próspero e cheio de realizações! 🎈🎁 Que seus sonhos se tornem realidade e que você continue brilhando como sempre! 💖`;
 
-            // Formata o número de telefone no formato do WhatsApp
+  const mensagensAniversario = [
+  `🎉 Feliz aniversário, ${cliente_nome}! 🥳 Que seu dia seja iluminado com muito amor, paz e felicidade! A família Terel deseja um ano incrível para você! 🎂🎈✨`,
+
+  `🎊 Parabéns, ${cliente_nome}! 🎁 Hoje é o seu dia especial, e queremos celebrar com você! Que esta nova fase da sua vida traga ainda mais alegrias, saúde e sucesso! 🎂💖`,
+
+  `🎂 Feliz aniversário, ${cliente_nome}! 🎈 Esperamos que seu dia seja repleto de momentos inesquecíveis e que o novo ciclo que se inicia traga tudo de melhor! Conte sempre com a gente! 🎊🥳`,
+
+  `🥳 Hoje é dia de festa, ${cliente_nome}! 🎂 Parabéns por mais um ano de vida! Que essa data marque o início de muitas conquistas e realizações. A equipe Terel deseja tudo de melhor para você! 🎁🎈`,
+
+  `🎈 Parabéns, ${cliente_nome}! 🎉 Que seu dia seja especial, cheio de alegria e boas energias! A equipe Terel deseja muita felicidade e sucesso nesta nova etapa! 🎂💖`,
+
+  `🎁 Parabéns pelo seu dia, ${cliente_nome}! 🥂 Que este novo ano de vida seja repleto de conquistas, momentos felizes e muita saúde. Aproveite o seu dia ao máximo! 🎉✨`,
+
+  `🎊 Feliz aniversário, ${cliente_nome}! 🎂 Hoje é um dia especial, e queremos celebrar com você. Que sua jornada seja sempre abençoada com felicidade, amor e sucesso! 💖🎈`,
+
+  `🎉 Viva, ${cliente_nome}! Hoje é o seu dia! 🎂 Que essa nova idade venha acompanhada de muitas realizações e sonhos concretizados. Aproveite muito o seu dia! 🥳🎁`,
+
+  `🎂 Parabéns, ${cliente_nome}! 🎉 Que essa data traga muita alegria, amor e esperança para sua vida. A família Terel deseja a você um ano cheio de momentos especiais! 🎊💖`,
+
+  `🥳 Feliz aniversário, ${cliente_nome}! 🎈 Desejamos que você tenha um dia repleto de amor e felicidade, cercado por quem te faz bem! Que sua nova idade traga ainda mais sucesso! 🎂🎁`,
+
+  `🎉 Hoje é um dia especial! Parabéns, ${cliente_nome}! 🎂 Que você continue conquistando seus sonhos e espalhando alegria por onde passa. A equipe Terel celebra com você! 🎈💖`,
+
+  `🎊 Parabéns, ${cliente_nome}! 🎉 Que seu novo ano de vida seja repleto de momentos inesquecíveis, muitas alegrias e muito sucesso. Estamos felizes por comemorar com você! 🎂🎁`
+];
+
+// Para escolher uma mensagem aleatória:
+const mensagemAniversario = mensagensAniversario[Math.floor(Math.random() * mensagensAniversario.length)];
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          // Formata o número de telefone no formato do WhatsApp
             const numeroWhatsApp = `${cliente_telefone.replace(/\D/g, '')}@c.us`;
 
             // Verifica se a função client.sendMessage está disponível
